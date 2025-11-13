@@ -1,0 +1,86 @@
+<div>
+  <label class="block text-md font-medium text-gray-700">{{ label }}</label>
+  <div
+    class="mt-1 p-4 border-2 border-dashed rounded-md transition-colors"
+    [ngClass]="
+      isDragging ? 'border-primary-500 bg-primary-50' : 'border-gray-300'
+    "
+    (drop)="HandleDrop($event)"
+    (dragover)="$event.preventDefault()"
+    (dragenter)="HandleDragEvents($event, true)"
+    (dragleave)="HandleDragEvents($event, false)"
+  >
+    <div class="flex items-center space-x-4 space-y-4 flex-wrap">
+      @if(previewMode === 'single' && previews.length > 0) {
+      <div
+        class="relative w-34 h-25 bg-gray-100 rounded-md flex items-center justify-center text-gray-400 overflow-hidden shrink-0 p-2"
+      >
+        <img
+          [src]="previews[0].url"
+          alt="preview"
+          class="w-full h-full object-contain"
+        />
+        <button
+          class="absolute top-1 right-1 bg-black/50 hover:bg-black/75 text-white rounded-full flex items-center justify-center p-1 transition-colors"
+          type="button"
+          (click)="HandleRemove(previews[0].id)"
+        >
+          <ng-icon name="matDeleteOutline"></ng-icon>
+        </button>
+      </div>
+
+      } @else { @if(previewMode !== 'mutiple') {
+      <div
+        class="w-34 h-25 bg-gray-100 rounded-md flex items-center justify-center text-gray-400 overflow-hidden shrink-0"
+      >
+        <span>Preview</span>
+      </div>
+      } }
+
+      <div class="">
+        <input
+          type="file"
+          accept="image/*"
+          class="hidden"
+          (change)="OnSelectImage($event)"
+          #inputFile
+        />
+        <button
+          class="inline-flex items-center justify-center font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400 px-4 py-2 text-sm"
+          type="button"
+          (click)="inputFile.click()"
+        >
+          <span class="mr-2 -ml-1 h-5 w-5">
+            <ng-icon name="matFileUploadOutline"></ng-icon>
+          </span>
+
+          Choose image
+        </button>
+        <p class="text-xs text-gray-500 mt-1">or drag and drop photos here.</p>
+      </div>
+    </div>
+
+    @if(previewMode === 'mutiple' && previews.length > 0) {
+    <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      @for(preview of previews; track $index) {
+      <div
+        class="relative aspect-square bg-gray-100 rounded-md overflow-hidden"
+      >
+        <img
+          [src]="preview.url"
+          [alt]="preview.file.name"
+          class="w-full h-full object-contain"
+        />
+        <button
+          class="absolute top-1 right-1 bg-black/50 hover:bg-black/75 text-white rounded-full flex items-center justify-center p-1 transition-colors"
+          type="button"
+          (click)="HandleRemove(previews[0].id)"
+        >
+          <ng-icon name="matDeleteOutline"></ng-icon>
+        </button>
+      </div>
+      }
+    </div>
+    }
+  </div>
+</div>

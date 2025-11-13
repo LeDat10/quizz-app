@@ -1,0 +1,67 @@
+<div>
+  <label class="block text-md font-medium text-gray-700">{{ label }}</label>
+  <div class="mt-1">
+    <div class="relative">
+      <button
+        class="relative w-full border border-gray-300 bg-white rounded-md shadow-sm py-2 px-3 text-left focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:shadow-primary-500/70 sm:text-md"
+        type="button"
+        (click)="OpenDorpdown()"
+      >
+        <span class="block truncate">{{ optionSelected.content }}</span>
+        <span
+          class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-event-none text-xl"
+          ><ng-icon
+            name="matKeyboardArrowDown"
+            class="transition transform origin-center"
+            [ngClass]="isDropdown ? 'rotate-180' : 'rotate-0'"
+          ></ng-icon
+        ></span>
+      </button>
+      <div
+        class="absolute mt-1 w-full rounded-md bg-white shadow-lg z-10 transition transform scale-95"
+        style="transform-origin: center top"
+        [ngClass]="{
+          'opacity-100': isDropdown,
+          'opacity-0': !isDropdown,
+          'scale-100': isDropdown,
+          'scale-95': !isDropdown,
+          'pointer-events-none': !isDropdown
+        }"
+      >
+        <ul
+          class="max-h-60 rounded-md py-1 text-base ring ring-gray-300 overflow-auto focus:outline-none sm:text-md"
+        >
+          @for(option of options; track $index) {
+          <li
+            class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 transition hover:bg-primary-50"
+            (click)="ChooseOption(option)"
+          >
+            <span
+              class="block truncate transition"
+              [ngClass]="
+                option.value === optionSelected.value
+                  ? 'font-semibold'
+                  : 'font-normal'
+              "
+              >{{ option.content }}</span
+            >
+
+            <span
+              class="absolute inset-y-0 flex items-center pr-4 right-0 text-primary-600 text-lg"
+              ><ng-icon
+                class="transition"
+                name="matCheck"
+                [ngClass]="
+                  option.value === optionSelected.value
+                    ? 'opacity-100'
+                    : 'opacity-0'
+                "
+              ></ng-icon
+            ></span>
+          </li>
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

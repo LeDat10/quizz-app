@@ -1,0 +1,15 @@
+<button
+  [ngClass]="[
+    baseClasses,
+    variantClasses[variant],
+    sizeClasses[size],
+    customClass
+  ]"
+  [type]="type"
+  (click)="clicked.emit($event)"
+>
+  @if(icon) {
+  <span class="mr-2 -ml-1 h-5 w-5"><ng-icon [name]="icon"></ng-icon></span>
+  }
+  <ng-content></ng-content>
+</button>

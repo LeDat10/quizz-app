@@ -1,0 +1,71 @@
+<div
+  class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm h-full flex flex-col"
+>
+  <div>
+    <h3 class="text-xl font-bold">Update Course</h3>
+  </div>
+  <form (submit)="OnSubmitted()">
+    <div class="p-6 flex flex-col space-y-6">
+      <app-custom-input
+        label="Title Course"
+        placeholder="Python Basic"
+        type="text"
+        class="block"
+      ></app-custom-input>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <app-custom-input
+          label="Position"
+          type="number"
+          placeholder="1"
+          id="position"
+          [min]="1"
+          class="block"
+        ></app-custom-input>
+
+        <app-custom-select
+          label="Status"
+          [options]="options"
+          class="block"
+        ></app-custom-select>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <app-custom-select
+          label="Category"
+          [options]="category"
+          class="block"
+        ></app-custom-select>
+        <app-custom-select
+          label="Course Type"
+          [options]="courseType"
+          class="block"
+        ></app-custom-select>
+      </div>
+
+      <app-custom-textarea
+        label="Description"
+        id="description"
+        class="block"
+      ></app-custom-textarea>
+
+      <app-custom-upload-image
+        label="Avatar"
+        previewMode="single"
+      ></app-custom-upload-image>
+    </div>
+
+    <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-2">
+      <app-custom-button
+        type="button"
+        variant="secondary"
+        (clicked)="OnCloseForm()"
+        >Cancel</app-custom-button
+      >
+
+      <app-custom-button type="submit" variant="primary"
+        >Save</app-custom-button
+      >
+    </div>
+  </form>
+</div>

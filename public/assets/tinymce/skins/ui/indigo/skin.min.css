@@ -1,0 +1,402 @@
+/* TinyMCE Indigo Skin - skin.min.css */
+/* Place this file in: public/assets/tinymce/skins/ui/indigo/skin.min.css */
+
+/* Base colors */
+:root {
+  --tox-color-primary: #6366f1;
+  --tox-color-primary-hover: #4f46e5;
+  --tox-color-primary-active: #4338ca;
+}
+
+/* Editor container */
+.tox.tox-tinymce {
+  border: 1px solid #d1d5db;
+  border-radius: 0;
+  box-shadow: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
+}
+
+/* Focus state */
+.tox.tox-tinymce.tox-tinymce--focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+/* Toolbar */
+.tox .tox-toolbar,
+.tox .tox-toolbar__overflow,
+.tox .tox-toolbar__primary {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Toolbar buttons */
+.tox .tox-tbtn {
+  background: transparent;
+  border: 0;
+  border-radius: 3px;
+  color: #374151;
+  cursor: pointer;
+  margin: 2px 0;
+  padding: 0;
+}
+
+.tox .tox-tbtn:hover {
+  background-color: #a5b4fc;
+  color: #1e1b4b;
+}
+
+.tox .tox-tbtn:focus {
+  background-color: #818cf8;
+  color: #f8fafc;
+  outline: none;
+}
+
+.tox .tox-tbtn--enabled,
+.tox .tox-tbtn--enabled:hover {
+  background-color: #6366f1;
+  color: #ffffff;
+}
+
+.tox .tox-tbtn--enabled:hover {
+  background-color: #4f46e5;
+}
+
+/* Menu bar */
+.tox .tox-menubar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tox .tox-mbtn {
+  background: transparent;
+  border: 0;
+  border-radius: 3px;
+  color: #374151;
+  cursor: pointer;
+  margin: 0 2px;
+  padding: 0 8px;
+}
+
+.tox .tox-mbtn:hover {
+  background-color: #a5b4fc;
+  color: #1e1b4b;
+}
+
+.tox .tox-mbtn:focus {
+  background-color: #818cf8;
+  color: #f8fafc;
+}
+
+.tox .tox-mbtn--active {
+  background-color: #6366f1;
+  color: #ffffff;
+}
+
+/* Dropdown menu */
+.tox .tox-menu {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.tox .tox-collection__item {
+  background-color: transparent;
+  color: #374151;
+  cursor: pointer;
+}
+
+.tox .tox-collection__item:hover {
+  background-color: #a5b4fc;
+  color: #1e1b4b;
+}
+
+.tox .tox-collection__item--active {
+  background-color: #818cf8;
+  color: #f8fafc;
+}
+
+.tox .tox-collection__item--enabled {
+  background-color: #6366f1;
+  color: #ffffff;
+}
+
+/* Split button */
+.tox .tox-split-button {
+  border: 0;
+  border-radius: 3px;
+}
+
+.tox .tox-split-button:hover {
+  box-shadow: 0 0 0 1px #4f46e5 inset;
+}
+
+.tox .tox-split-button__chevron {
+  width: 16px;
+}
+
+.tox .tox-split-button:focus {
+  background-color: #818cf8;
+  color: #f8fafc;
+}
+
+/* Edit area */
+.tox .tox-edit-area {
+  border: 0;
+}
+
+.tox .tox-edit-area__iframe {
+  background-color: #ffffff;
+}
+
+/* Sidebar */
+.tox .tox-sidebar {
+  background-color: #ffffff;
+  border-left: 1px solid #e5e7eb;
+}
+
+/* Statusbar */
+.tox .tox-statusbar {
+  background-color: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  color: #6b7280;
+  padding: 0 8px;
+}
+
+.tox .tox-statusbar a {
+  color: #6b7280;
+}
+
+.tox .tox-statusbar a:hover {
+  color: #4f46e5;
+  text-decoration: underline;
+}
+
+.tox .tox-statusbar a:focus {
+  color: #4338ca;
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+}
+
+/* Resize handle */
+.tox .tox-statusbar__resize-handle {
+  cursor: nwse-resize;
+}
+
+.tox .tox-statusbar__resize-handle:hover {
+  color: #4f46e5;
+}
+
+/* Buttons */
+.tox .tox-button {
+  background-color: #6366f1;
+  border: 1px solid #6366f1;
+  border-radius: 6px;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+}
+
+.tox .tox-button:hover {
+  background-color: #4f46e5;
+  border-color: #4338ca;
+}
+
+.tox .tox-button:focus {
+  background-color: #4338ca;
+  border-color: #3730a3;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4);
+  outline: none;
+}
+
+.tox .tox-button--secondary {
+  background-color: transparent;
+  border: 1px solid #6366f1;
+  color: #6366f1;
+}
+
+.tox .tox-button--secondary:hover {
+  background-color: #a5b4fc;
+  border-color: #4f46e5;
+  color: #1e1b4b;
+}
+
+.tox .tox-button--secondary:focus {
+  background-color: #818cf8;
+  border-color: #4338ca;
+  color: #f8fafc;
+}
+
+/* Input fields */
+.tox .tox-textfield,
+.tox .tox-textarea,
+.tox .tox-listboxfield {
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  color: #374151;
+  padding: 8px;
+}
+
+.tox .tox-textfield:hover,
+.tox .tox-textarea:hover,
+.tox .tox-listboxfield:hover {
+  border-color: #818cf8;
+}
+
+.tox .tox-textfield:focus,
+.tox .tox-textarea:focus,
+.tox .tox-listboxfield:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+  outline: none;
+}
+
+/* Dialog */
+.tox .tox-dialog {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.tox .tox-dialog__header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 16px 24px;
+}
+
+.tox .tox-dialog__title {
+  color: #111827;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.tox .tox-dialog__body {
+  padding: 24px;
+}
+
+.tox .tox-dialog__footer {
+  background-color: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  padding: 16px 24px;
+}
+
+/* Tabs */
+.tox .tox-tab {
+  background-color: transparent;
+  border-bottom: 2px solid transparent;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 8px 16px;
+}
+
+.tox .tox-tab:hover {
+  color: #4f46e5;
+}
+
+.tox .tox-tab--active {
+  border-bottom-color: #6366f1;
+  color: #6366f1;
+}
+
+/* Color picker */
+.tox .tox-swatch {
+  border: 1px solid #d1d5db;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.tox .tox-swatch:hover {
+  box-shadow: 0 0 0 2px #4f46e5;
+}
+
+/* Table picker */
+.tox .tox-insert-table-picker__selected {
+  background-color: rgba(79, 70, 229, 0.6);
+  border-color: #4f46e5;
+}
+
+.tox .tox-insert-table-picker__selected:hover {
+  background-color: rgba(79, 70, 229, 0.8);
+}
+
+/* Notifications */
+.tox .tox-notification {
+  border-radius: 6px;
+}
+
+.tox .tox-notification--info {
+  background-color: #dbeafe;
+  border-left: 4px solid #6366f1;
+}
+
+.tox .tox-notification--warning {
+  background-color: #fef3c7;
+  border-left: 4px solid #f59e0b;
+}
+
+.tox .tox-notification--error {
+  background-color: #fee2e2;
+  border-left: 4px solid #ef4444;
+}
+
+.tox .tox-notification--success {
+  background-color: #d1fae5;
+  border-left: 4px solid #10b981;
+}
+
+/* Scrollbar */
+.tox ::-webkit-scrollbar {
+  height: 12px;
+  width: 12px;
+}
+
+.tox ::-webkit-scrollbar-track {
+  background-color: #f3f4f6;
+}
+
+.tox ::-webkit-scrollbar-thumb {
+  background-color: #a5b4fc;
+  border-radius: 6px;
+}
+
+.tox ::-webkit-scrollbar-thumb:hover {
+  background-color: #818cf8;
+}
+
+/* Tooltip */
+.tox .tox-pop {
+  background-color: #1f2937;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  color: #ffffff;
+}
+
+.tox .tox-pop__dialog {
+  border-color: #4f46e5;
+}
+
+/* Loading spinner */
+.tox .tox-throbber {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.tox .tox-throbber__busy-spinner {
+  border-color: #c7d2fe #c7d2fe #6366f1 #6366f1;
+}
+
+/* Selection */
+::selection {
+  background-color: #c7d2fe;
+  color: #1e1b4b;
+}
+
+::-moz-selection {
+  background-color: #c7d2fe;
+  color: #1e1b4b;
+}

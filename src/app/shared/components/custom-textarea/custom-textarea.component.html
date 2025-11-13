@@ -1,0 +1,13 @@
+<div class="w-full">
+  <label [for]="id" class="block text-md font-medium text-gray-700">{{
+    label
+  }}</label>
+  <editor
+    apiKey="vcbgfqutgjbvv0cl9kdsjylyti5d6xq99x8gkrigm9jg62u4"
+    [init]="editorConfig"
+    [ariaValueNow]="value"
+    (onChange)="onInputChange($event)"
+    [id]="id"
+    class="mt-1 w-full"
+  ></editor>
+</div>

@@ -1,0 +1,210 @@
+/* TinyMCE Indigo Content Styles - content.min.css */
+/* Place this file in: public/assets/tinymce/skins/ui/indigo/content.min.css */
+
+/* Editor content area - indigo focus colors */
+.mce-content-body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #111827;
+}
+
+/* Selection colors */
+.mce-content-body ::selection {
+  background-color: #c7d2fe;
+  color: #1e1b4b;
+}
+
+.mce-content-body ::-moz-selection {
+  background-color: #c7d2fe;
+  color: #1e1b4b;
+}
+
+/* Selected elements */
+.mce-content-body img[data-mce-selected],
+.mce-content-body video[data-mce-selected],
+.mce-content-body audio[data-mce-selected],
+.mce-content-body object[data-mce-selected],
+.mce-content-body embed[data-mce-selected],
+.mce-content-body table[data-mce-selected],
+.mce-content-body details[data-mce-selected] {
+  outline: 3px solid #c7d2fe;
+}
+
+.mce-content-body hr[data-mce-selected] {
+  outline: 3px solid #c7d2fe;
+  outline-offset: 1px;
+}
+
+/* Focus */
+.mce-content-body *[contentEditable="false"] *[contentEditable="true"]:focus {
+  outline: 3px solid #c7d2fe;
+}
+
+.mce-content-body *[contentEditable="false"] *[contentEditable="true"]:hover {
+  outline: 3px solid #c7d2fe;
+}
+
+.mce-content-body *[contentEditable="false"][data-mce-selected] {
+  cursor: not-allowed;
+  outline: 3px solid #c7d2fe;
+}
+
+.mce-content-body *[data-mce-selected="inline-boundary"] {
+  background-color: #c7d2fe;
+}
+
+.mce-content-body .mce-edit-focus {
+  outline: 3px solid #c7d2fe;
+}
+
+/* Table cell selection */
+.mce-content-body td[data-mce-selected],
+.mce-content-body th[data-mce-selected] {
+  position: relative;
+}
+
+.mce-content-body td[data-mce-selected]::after,
+.mce-content-body th[data-mce-selected]::after {
+  background-color: rgba(199, 210, 254, 0.7);
+  border: 1px solid rgba(199, 210, 254, 0.7);
+  bottom: -1px;
+  content: "";
+  left: -1px;
+  mix-blend-mode: multiply;
+  position: absolute;
+  right: -1px;
+  top: -1px;
+}
+
+.mce-content-body td[data-mce-selected]::selection,
+.mce-content-body th[data-mce-selected]::selection {
+  background: none;
+}
+
+/* Resize handles */
+.mce-content-body div.mce-resizehandle {
+  background-color: #818cf8;
+  border-color: #818cf8;
+  border-style: solid;
+  border-width: 1px;
+  box-sizing: border-box;
+  height: 10px;
+  position: absolute;
+  width: 10px;
+  z-index: 1298;
+}
+
+.mce-content-body div.mce-resizehandle:hover {
+  background-color: #6366f1;
+  border-color: #6366f1;
+}
+
+.mce-content-body div.mce-resizehandle:nth-of-type(1) {
+  cursor: nwse-resize;
+}
+
+.mce-content-body div.mce-resizehandle:nth-of-type(2) {
+  cursor: nesw-resize;
+}
+
+.mce-content-body div.mce-resizehandle:nth-of-type(3) {
+  cursor: nwse-resize;
+}
+
+.mce-content-body div.mce-resizehandle:nth-of-type(4) {
+  cursor: nesw-resize;
+}
+
+/* Table resizer */
+.ephox-snooker-resizer-bar {
+  background-color: #c7d2fe;
+  opacity: 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.ephox-snooker-resizer-cols {
+  cursor: col-resize;
+}
+
+.ephox-snooker-resizer-rows {
+  cursor: row-resize;
+}
+
+.ephox-snooker-resizer-bar.ephox-snooker-resizer-bar-dragging {
+  opacity: 1;
+}
+
+/* Links */
+.mce-content-body a {
+  color: #6366f1;
+}
+
+.mce-content-body a:hover {
+  color: #4f46e5;
+  text-decoration: underline;
+}
+
+.mce-content-body a:focus {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+/* Comments */
+.tox-comments-visible span.tox-comment[data-mce-selected] {
+  background-color: #ffcf30;
+  border-radius: 3px;
+  box-shadow: 0 0 0 2px #6366f1;
+}
+
+.tox-comments-visible
+  span.tox-comment[data-mce-selected]
+  img:not([data-mce-selected]),
+.tox-comments-visible
+  span.tox-comment[data-mce-selected]
+  > audio:not([data-mce-selected]),
+.tox-comments-visible
+  span.tox-comment[data-mce-selected]
+  > video:not([data-mce-selected]),
+.tox-comments-visible
+  span.tox-comment[data-mce-selected]
+  span.mce-preview-object:not([data-mce-selected]) {
+  box-shadow: 0 0 0 5px #6366f1;
+}
+
+/* Merge tags */
+.mce-content-body .mce-mergetag:hover {
+  background-color: rgba(99, 102, 241, 0.1);
+}
+
+.mce-content-body .mce-mergetag-affix {
+  background-color: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+}
+
+/* Spellchecker */
+.mce-spellchecker-word {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D'4'%20height%3D'4'%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%3E%3Cpath%20stroke%3D'%236366f1'%20fill%3D'none'%20stroke-linecap%3D'round'%20stroke-opacity%3D'.75'%20d%3D'M0%203L2%201%204%203'%2F%3E%3C%2Fsvg%3E%0A");
+  background-position: 0 calc(100% + 1px);
+  background-repeat: repeat-x;
+  background-size: auto 6px;
+  cursor: default;
+}
+
+/* Match marker */
+.mce-match-marker {
+  background: #a5b4fc;
+  color: #1e1b4b;
+}
+
+.mce-match-marker-selected {
+  background: #6366f1;
+  color: #ffffff;
+}
+
+.mce-match-marker-selected::selection {
+  background: #6366f1;
+  color: #ffffff;
+}

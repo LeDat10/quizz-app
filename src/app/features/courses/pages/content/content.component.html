@@ -1,0 +1,101 @@
+<div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-1 space-y-4">
+      <app-custom-button icon="matPlus" customClass="w-full mb-3"
+        >Add Chapter</app-custom-button
+      >
+      <div>
+        <div
+          class="bg-gray-100 dark:bg-gray-700/50 rounded-lg"
+          *ngFor="let item of chaptersWithLessons"
+        >
+          <div
+            class="flex items-center justify-between p-3 hover:bg-gray-200 dark:hover:bg-gray-700 transition rounded-md"
+          >
+            <div class="flex items-center flex-grow min-w-0">
+              <ng-icon name="matMenu"></ng-icon>
+              <a
+                class="font-semibold ml-2 text-gray-800 dark:text-gray-200 hover:text-primary-600 hover:underline truncate"
+              >
+                {{ item.title }}
+              </a>
+              <button
+                class="ml-2 p-1 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 flex-shrink-0"
+                type="button"
+                (click)="toggleChapter(item.id)"
+              >
+                <span
+                  class="block transform transition-transform duration-200 w-5 h-5"
+                >
+                  <ng-icon name="matKeyboardArrowDown"></ng-icon>
+                </span>
+              </button>
+            </div>
+            <div class="flex items-center space-x-1 flex-shrink-0">
+              <button
+                class="inline-flex items-center justify-center font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-primary-500 px-2.5 py-1.5 text-xs"
+              >
+                <span
+                  class="flex items-center justify-center mr-2 -ml-1 h-5 w-5"
+                >
+                  <ng-icon name="matPlus"></ng-icon>
+                </span>
+
+                <span class="hidden sm:inline">Add Lesson</span>
+              </button>
+
+              <app-custom-edit-button></app-custom-edit-button>
+
+              <app-custom-delete-button
+                titlePopup="Delete Chapter"
+                descriptionPopup="Are you sure delete this chapter?"
+              ></app-custom-delete-button>
+            </div>
+          </div>
+
+          <div
+            class="pl-6 pr-3 pb-3 space-y-2 transition-all ease-in-out"
+            [ngClass]="
+              isChapterOpen(item.id)
+                ? 'max-h-[1000px] opacity-100'
+                : 'max-h-0 opacity-0 pointer-events-none'
+            "
+          >
+            @for(lesson of item.lessons; track $index) {
+            <div
+              class="p-3 rounded-md border flex items-center justify-between cursor-pointer transition-colors duration-150"
+              (click)="OnLessonActive(lesson.id)"
+              [ngClass]="
+                lessonActiveId === lesson.id
+                  ? 'bg-primary-50 dark:bg-primary-900/20 border-primary-300 dark:border-primary-700'
+                  : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-white/5'
+              "
+            >
+              <div class="flex items-center min-w-0">
+                <ng-icon class="w-5 h-5" name="matMenu"></ng-icon>
+                <span
+                  class="ml-2 text-sm font-medium truncate text-primary-800 dark:text-primary-200"
+                  >{{ lesson.title }}</span
+                >
+              </div>
+
+              <div class="flex items-center space-x-2 flex-shrink-0">
+                <span
+                  class="text-xs text-gray-500 dark:text-gray-400 hidden sm:inline"
+                  >Bài giảng</span
+                >
+                <app-custom-edit-button></app-custom-edit-button>
+                <app-custom-delete-button
+                  titlePopup="Delete Chapter"
+                  descriptionPopup="Are you sure delete this chapter?"
+                  customClass="px-0 py-0"
+                ></app-custom-delete-button>
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

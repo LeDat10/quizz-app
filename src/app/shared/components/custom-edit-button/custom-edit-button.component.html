@@ -1,0 +1,8 @@
+<button
+  class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center justify-center transition-colors duration-200 cursor-pointer"
+  [ngClass]="customClass"
+  (click)="OnClicked()"
+>
+  <ng-icon class="w-5 h-5" name="matEdit"></ng-icon>
+  <span *ngIf="content">{{ content }}</span>
+</button>

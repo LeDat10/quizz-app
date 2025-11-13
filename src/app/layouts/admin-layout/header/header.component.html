@@ -1,0 +1,49 @@
+<header
+  class="flex items-center justify-between h-16 bg-white border-b border-gray-200 px-4 md:px-6"
+>
+  <div class="flex-1 items-center flex">
+    <button
+      class="md:hidden mr-4 text-gray-500 hover:text-gray-700"
+      aria-label="Open Sidebar"
+      (click)="onMenuClicked()"
+    >
+      <ng-icon name="matMenu"></ng-icon>
+    </button>
+    <div class="flex-1 max-w-lg">
+      <div class="relative">
+        <button
+          class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-auto"
+        >
+          <ng-icon name="matSearch"></ng-icon>
+        </button>
+        <input
+          placeholder="Search course, student..."
+          class="block"
+          class="pl-10 w-full block pr-3 py-2 border border-gray-300 rounded-md bg-white placeholder-gray-500 leading-5 focus:outline-none focus:placeholder-gray-400 focus:ring-1 ring-primary-500 focus:border-primary-500 sm:text-md"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="ml-4 items-center flex space-x-4">
+    <button
+      class="p-2 text-xl size-10 rounded-full text-gray-500 hover:bg-gray-100 hover-text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+    >
+      <ng-icon class="w-5 h-5" name="matNotificationsNoneOutline"></ng-icon>
+    </button>
+
+    <div class="relative">
+      <button
+        class="border-2 border-transparent rounded-full focus:outline-none focus:border-primary-500 transition"
+      >
+        <img class="size-10 rounded-full object-cover" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<main
+  class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 md:p-6 lg:p-8"
+>
+  <router-outlet></router-outlet>
+</main>

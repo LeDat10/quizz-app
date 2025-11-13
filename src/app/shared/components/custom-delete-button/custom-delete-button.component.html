@@ -1,0 +1,76 @@
+<button
+  class="inline-flex items-center justify-center focus:outline-none font-semibold rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-transparent text-gray-600 dark:text-gray-400 text-md text-gray-600 hover:text-red-600 cursor-pointer"
+  [ngClass]="customClass"
+  (click)="OnOpenPopup()"
+>
+  <ng-icon name="matDeleteOutline" class="w-5 h-5"></ng-icon>
+</button>
+
+<div
+  *ngIf="showPopupDelete"
+  class="fixed inset-0 z-50 flex items-center justify-center"
+>
+  <div
+    class="fixed inset-0 bg-gray-500/75 transition-opacity duration-300 ease-in-out dark:bg-black dark:bg-opacity-75"
+    [ngClass]="showPopupDelete ? 'opacity-100' : 'opacity-0'"
+    (click)="OnClosePopup()"
+  ></div>
+
+  <div
+    class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl transform transition-all duration-300 ease-in-out sm:my-8 sm:max-w-lg sm:w-full mx-4"
+    [ngClass]="showPopupDelete ? 'animate-fadeOut' : 'animate-fadeIn'"
+  >
+    <div
+      class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-gray-200 dark:border-gray-700"
+    >
+      <div class="sm:flex sm:items-start">
+        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+          <h3
+            class="text-lg leading-6 font-medium text-gray-900 dark:text-white"
+          >
+            {{ titlePopup }}
+          </h3>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="p-6">
+        <div class="flex items-start">
+          <div
+            class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 sm:mx-0 sm:h-10 sm:w-10"
+          >
+            <ng-icon
+              name="matWarning"
+              class="w-5 h-5 h-6 w-6 text-red-600 dark:text-red-400"
+            ></ng-icon>
+          </div>
+
+          <div class="ml-4 mt-2 text-left">
+            <p class="text-sm text-gray-600 dark:text-gray-300">
+              {{ descriptionPopup }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="bg-gray-50 dark:bg-gray-800/50 px-6 py-4 flex flex-row-reverse space-x-2 space-x-reverse"
+    >
+      <button
+        class="inline-flex items-center justify-center font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-red-600 text-white hover:bg-red-500 focus:ring-red-500 px-4 py-2 text-sm"
+        (click)="OnConfirm()"
+      >
+        Delete
+      </button>
+
+      <button
+        class="inline-flex items-center justify-center font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 focus:ring-gray-400 dark:focus:ring-gray-500 px-4 py-2 text-sm"
+        (click)="OnClosePopup()"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
