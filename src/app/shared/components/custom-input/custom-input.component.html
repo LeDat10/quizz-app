@@ -1,4 +1,4 @@
-<div>
+<!-- <div>
   <label [for]="id" class="block text-md font-medium text-gray-700">{{
     label
   }}</label>
@@ -15,4 +15,37 @@
     [max]="max"
     class="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:shadow-primary-500/70 sm:text-md"
   />
-</div>
+</div> -->
+
+<!-- <nz-input-group nzPrefixIcon="user">
+  <input
+    [type]="type"
+    nz-input
+    [placeholder]="placeholder"
+    (input)="onInputChange($event)"
+    (blur)="onBlur()"
+    [name]="name"
+    [value]="value"
+    [step]="step"
+    [max]="max"
+  />
+</nz-input-group> -->
+
+<nz-form-item>
+  <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired [nzFor]="id">{{
+    label
+  }}</nz-form-label>
+  <nz-form-control nzErrorTip="The input is not valid E-mail!">
+    <input
+      [type]="type"
+      nz-input
+      [placeholder]="placeholder"
+      (input)="onInputChange($event)"
+      (blur)="onBlur()"
+      [name]="name"
+      [value]="value"
+      [step]="step"
+      [max]="max"
+    />
+  </nz-form-control>
+</nz-form-item>

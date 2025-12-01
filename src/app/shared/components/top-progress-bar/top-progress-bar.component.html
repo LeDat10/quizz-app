@@ -1,0 +1,11 @@
+<div class="fixed top-0 left-0 w-full z-[9999] pointer-events-none">
+  <div
+    class="h-[2px] bg-gradient-to-r from-primary-300 via-primary-500 to-primary-600 transition-all ease-out"
+    [ngClass]="isVisible ? 'opacity-100' : 'opacity-0'"
+    [style]="{ 
+          width: `${progress}%`,
+          boxShadow: '0 0 10px #38bdf8, 0 0 5px #0284c7', 
+          transitionDuration: progress === 100 ? '200ms' : '500ms'
+        }"
+  ></div>
+</div>

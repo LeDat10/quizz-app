@@ -1,4 +1,60 @@
-<div class="md:flex h-dvh bg-gray-100 text-gray-800">
+<!-- <div class="md:flex h-dvh bg-gray-100 text-gray-800">
   <app-sidebar></app-sidebar>
   <app-header class="flex-1 flex flex-col"></app-header>
-</div>
+</div> -->
+
+<nz-layout class="!min-h-screen">
+  <nz-sider nzCollapsible [(nzCollapsed)]="isCollapsed" [nzTrigger]="null">
+    <div class="text-white h-8 text-center m-4">
+      <span class="inline-block font-bold text-xl">Quizz</span>
+    </div>
+    <ul nz-menu nzTheme="dark" nzMode="inline">
+      @for(item of navItems; track $index) { @if (!item.children) {
+      <li nz-menu-item>
+        <a [routerLink]="item.link">
+          <nz-icon [nzType]="item.iconName" />
+          <span>Dashboard</span>
+        </a>
+      </li>
+      } @else {
+      <li nz-submenu [nzTitle]="item.title" [nzIcon]="item.iconName">
+        <ul>
+          @for(child of item.children; track $index) {
+          <li nz-menu-item>
+            <a [routerLink]="child.link">
+              <span>{{ child.title }}</span>
+            </a>
+          </li>
+          }
+        </ul>
+      </li>
+      } }
+    </ul>
+  </nz-sider>
+
+  <nz-layout class="!h-full">
+    <nz-header class="!px-0 !bg-white">
+      <button
+        class="!w-16 !h-16"
+        nz-button
+        nzType="text"
+        (click)="isCollapsed = !isCollapsed"
+      >
+        <nz-icon
+          [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"
+          class="text-lg"
+        />
+      </button>
+    </nz-header>
+
+    <nz-content class="!mx-4 !h-full">
+      <nz-breadcrumb class="!my-4">
+        <nz-breadcrumb-item>User</nz-breadcrumb-item>
+        <nz-breadcrumb-item>Bill</nz-breadcrumb-item>
+      </nz-breadcrumb>
+      <div class="h-full bg-white p-6">
+        <router-outlet></router-outlet>
+      </div>
+    </nz-content>
+  </nz-layout>
+</nz-layout>

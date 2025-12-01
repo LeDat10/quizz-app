@@ -1,4 +1,4 @@
-<div
+<!-- <div
   class="fixed inset-0 z-50 flex items-center justify-center"
   *ngIf="isMounted"
 >
@@ -88,4 +88,16 @@
       </div>
     </form>
   </div>
-</div>
+</div> -->
+
+<nz-modal
+  [(nzVisible)]="showForm"
+  nzTitle="Add Course"
+  (nzOnCancel)="OnCloseForm()"
+  nzWidth="60%"
+  [nzFooter]="null"
+>
+  <ng-container *nzModalContent>
+    <app-course-form></app-course-form>
+  </ng-container>
+</nz-modal>

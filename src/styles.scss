@@ -1,4 +1,4 @@
-/* You can add global styles to this file, and also import other style files */
+// /* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
 
 @theme {
@@ -25,62 +25,78 @@
     --color-gray-900: #111827;
 
 
-    --animate-fadeIn: fadeIn 0.3s ease-in-out 1;
+    // --animate-fadeIn: fadeIn 0.3s ease-in-out 1;
 
-    @keyframes fadeIn {
+    @keyframes modalZoomIn {
         0% {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        100% {
+            opacity: 1;
             transform: scale(1);
-            opacity: 100%;
-        }
-
-        100% {
-            transform: scale(0);
-            opacity: 0%;
         }
     }
 
-    --animate-fadeOut: fadeOut 0.3s ease-in-out 1;
+    --animate-modalZoomIn: modalZoomIn 0.2s ease-out forwards;
 
-    @keyframes fadeOut {
-        0% {
-            transform: scale(0);
-            opacity: 0%;
-        }
+    // @keyframes fadeIn {
+    //     0% {
+    //         transform: scale(1);
+    //         opacity: 100%;
+    //     }
 
-        100% {
-            transform: scale(1);
-            opacity: 100%;
-        }
-    }
+    //     100% {
+    //         transform: scale(0);
+    //         opacity: 0%;
+    //     }
+    // }
 
-    --animate-slideDown: slideDown 0.3s ease-in-out 1;
+    // --animate-fadeOut: fadeOut 0.3s ease-in-out 1;
 
-    @keyframes slideDown {
-        0% {
-            transform: scaleY(0);
-            height: 0;
-        }
+    // @keyframes fadeOut {
+    //     0% {
+    //         transform: scale(0);
+    //         opacity: 0%;
+    //     }
 
-        100% {
-            transform: scaleY(1);
-            height: auto;
-        }
-    }
+    //     100% {
+    //         transform: scale(1);
+    //         opacity: 100%;
+    //     }
+    // }
 
-    --animate-slideUp: slideUp 0.3s ease-in-out 1;
+    // --animate-slideDown: slideDown 0.3s ease-in-out 1;
 
-    @keyframes slideUp {
-        0% {
-            transform: scaleY(1);
-            height: auto;
-        }
+    // @keyframes slideDown {
+    //     0% {
+    //         transform: scaleY(0);
+    //         height: 0;
+    //     }
 
-        100% {
-            transform: scaleY(0);
-            height: 0;
-        }
-    }
+    //     100% {
+    //         transform: scaleY(1);
+    //         height: auto;
+    //     }
+    // }
+
+    // --animate-slideUp: slideUp 0.3s ease-in-out 1;
+
+    // @keyframes slideUp {
+    //     0% {
+    //         transform: scaleY(1);
+    //         height: auto;
+    //     }
+
+    //     100% {
+    //         transform: scaleY(0);
+    //         height: 0;
+    //     }
+    // }
 }
 
-// html, body { height: 100%; }
-// body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+// // html, body { height: 100%; }
+// // body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+//   "@angular/material/prebuilt-themes/azure-blue.css"

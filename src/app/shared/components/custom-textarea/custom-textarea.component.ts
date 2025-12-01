@@ -34,7 +34,7 @@ export class CustomTextareaComponent implements ControlValueAccessor {
     promotion: false,
     branding: false,
   };
-
+  editorInstance: any = null;
   value: string = '';
   private onChange = (value: string) => {};
   private onTouched = () => {};
@@ -58,5 +58,13 @@ export class CustomTextareaComponent implements ControlValueAccessor {
     const content = event.editor.getContent();
     this.onChange(content);
     this.onTouched();
+  }
+
+  onEditorInit(event: any) {
+    this.editorInstance = event.editor;
+
+    if (this.value) {
+      this.editorInstance.setContent(this.value);
+    }
   }
 }

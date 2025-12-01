@@ -1,6 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
-import { initialState } from './course.state';
-import { showForm } from './course.actions';
+import { courseAdapter, initialState } from './course.state';
+import { getCoursesSucccess, showForm } from './course.actions';
 
 export const courseReducer = createReducer(
   initialState,
@@ -9,5 +9,14 @@ export const courseReducer = createReducer(
       ...state,
       showForm: action.value,
     };
+  }),
+  on(getCoursesSucccess, (state, action) => {
+    return courseAdapter.setAll(action.coursesResponse.data, {
+      ...state,
+      links: action.coursesResponse.links,
+      meta: action.coursesResponse.meta,
+      listLoading: false,
+      loaded: true,
+    });
   })
 );

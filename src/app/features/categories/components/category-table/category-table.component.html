@@ -1,0 +1,92 @@
+<nz-spin [nzSpinning]="listLoading$ | async" nzTip="Loading Categories...">
+  <nz-table
+    nzShowPagination
+    nzShowSizeChanger
+    [nzData]="categories"
+    [nzPageIndex]="(meta$ | async)?.currentPage || 1"
+    [nzPageSize]="(meta$ | async)?.itemsPerPage || pageSize"
+    [nzTotal]="(meta$ | async)?.totalItems || 0"
+    [nzFrontPagination]="false"
+    (nzPageIndexChange)="onPageIndexChange($event)"
+    (nzPageSizeChange)="onPageSizeChange($event)"
+    [nzScroll]="{ x: 'auto', y: scrollY }"
+  >
+    <thead>
+      <tr>
+        <th
+          [nzChecked]="checked"
+          [nzWidth]="'100px'"
+          [nzIndeterminate]="indeterminate"
+          (nzCheckedChange)="onAllChecked($event)"
+        ></th>
+
+        <th>Image</th>
+        <th nzShowSort>Title</th>
+        <th nzShowSort>Position</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (data of categories; track data.id) {
+      <tr>
+        <td
+          [nzChecked]="setOfCheckedId.has(data.id)"
+          (nzCheckedChange)="onItemChecked(data.id, $event)"
+        ></td>
+        <td>
+          <img
+            [src]="data.thumbnail"
+            [alt]="data.title"
+            class="w-17 h-17 object-cover"
+          />
+        </td>
+        <td>{{ data.title }}</td>
+        <td>
+          <nz-input-number
+            [(ngModel)]="data.position"
+            nzMin="1"
+          ></nz-input-number>
+        </td>
+        <td>
+          <button
+            class="cursor-pointer"
+            (click)="OnChangeStatus({ id: data.id, status: data.status })"
+          >
+            <nz-tag [nzColor]="statusTypeMap[data.status]">{{
+              data.status
+            }}</nz-tag>
+          </button>
+        </td>
+        <td>
+          <div nz-row>
+            <div nz-col nz-tooltip nzTooltipTitle="Detail">
+              <button nz-button nzType="text">
+                <nz-icon nzType="eye" nzTheme="outline" />
+              </button>
+            </div>
+            <div nz-col nz-tooltip nzTooltipTitle="Edit">
+              <button nz-button nzType="link" (click)="OnCategoryEdit(data.id)">
+                <nz-icon nzType="edit" nzTheme="outline" />
+              </button>
+            </div>
+            <div nz-col nz-tooltip nzTooltipTitle="Delete">
+              <button nz-button nzType="text" nzDanger>
+                <nz-icon nzType="delete" nzTheme="outline" />
+              </button>
+            </div>
+          </div>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </nz-table>
+
+  <app-action-bar
+    [selectedQuantity]="setOfCheckedId.size"
+    (positionClicked)="OnUpdatePositionMultiple()"
+    (statusClicked)="OnUpdateStatusMultiple($event)"
+    (closeActionBarClicked)="OnCloseActionBar()"
+  ></app-action-bar>
+</nz-spin>

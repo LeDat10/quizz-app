@@ -1,4 +1,4 @@
-<div class="space-y-6">
+<!-- <div class="space-y-6">
   <div class="flex justify-between items-center">
     <h1 class="text-3xl font-bold text-gray-900">Category</h1>
     <button
@@ -11,6 +11,24 @@
       Add Category
     </button>
   </div>
+</div>
+
+<app-category-form></app-category-form> -->
+<!-- <div>Category</div> -->
+<div>
+  <div nz-row nzJustify="space-between" nzAlign="middle">
+    <div nz-col>
+      <h1 class="!text-3xl !font-bold !text-gray-900">Category</h1>
+    </div>
+    <div nz-col>
+      <button nz-button nzType="primary" (click)="OnAddCategory()">
+        <nz-icon nzType="plus" nzTheme="outline" />
+        <span>Add</span>
+      </button>
+    </div>
+  </div>
+
+  <app-category-table></app-category-table>
 </div>
 
 <app-category-form></app-category-form>

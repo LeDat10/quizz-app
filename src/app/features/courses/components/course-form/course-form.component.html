@@ -1,0 +1,120 @@
+<nz-spin [nzSpinning]="false">
+  <form
+    nz-form
+    nzLayout="vertical"
+    [formGroup]="courseForm"
+    (ngSubmit)="OnSubmitted()"
+  >
+    <nz-form-item>
+      <nz-form-label nzRequired nzFor="title"> Title </nz-form-label>
+      <nz-form-control>
+        <input type="text" id="title" nz-input formControlName="title" />
+      </nz-form-control>
+    </nz-form-item>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <nz-form-item>
+        <nz-form-label nzFor="position"> Position </nz-form-label>
+        <nz-form-control>
+          <nz-input-number
+            id="position"
+            formControlName="position"
+            nzMin="1"
+            class="!w-full"
+            nzPlaceHolder="Auto-increment"
+          ></nz-input-number>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzRequired nzFor="status">Status</nz-form-label>
+        <nz-form-control nzErrorTip="The input is not valid Status!">
+          <nz-select formControlName="status" id="satus">
+            <nz-option nzLabel="Draft" nzValue="draft"></nz-option>
+            <nz-option nzLabel="Published" nzValue="published"></nz-option>
+            <nz-option nzLabel="Inactive" nzValue="inactive"></nz-option>
+            <nz-option nzLabel="Archived" nzValue="archived"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <nz-form-item>
+        <nz-form-label nzFor="category"> Category </nz-form-label>
+        <nz-form-control>
+          <nz-select formControlName="categoryId" id="category">
+            <nz-option nzLabel="Draft" nzValue="draft"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzRequired nzFor="type">Type</nz-form-label>
+        <nz-form-control nzErrorTip="The input is not valid Status!">
+          <nz-select formControlName="typeCourse" id="type">
+            <nz-option nzLabel="Free" nzValue="free"></nz-option>
+            <nz-option nzLabel="Premium" nzValue="premium"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+
+    <nz-form-item>
+      <app-custom-textarea
+        label="Description"
+        [id]="'description'"
+        class="block w-full"
+        formControlName="description"
+      ></app-custom-textarea>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-label nzFor="image">Image</nz-form-label>
+      <nz-form-control>
+        <nz-upload
+          nzListType="picture-card"
+          [nzCustomRequest]="uploadToCloudinary"
+          [nzPreview]="handlePreview"
+          [nzLimit]="1"
+          [nzAccept]="'image/*'"
+          [nzFileList]="fileList"
+          (nzChange)="handleChangeUpload($event)"
+          [nzDownload]="handleDownload"
+          [nzRemove]="handleRemove"
+        >
+          <div>
+            <nz-icon nzType="plus" />
+            <div style="margin-top: 8px">Upload</div>
+          </div>
+        </nz-upload>
+        <nz-modal
+          [nzVisible]="previewVisible"
+          [nzContent]="modalContent"
+          [nzFooter]="null"
+          (nzOnCancel)="previewVisible = false"
+        >
+          <ng-template #modalContent>
+            <img [src]="previewImage" style="width: 100%" />
+          </ng-template>
+        </nz-modal>
+      </nz-form-control>
+    </nz-form-item>
+
+    <div nz-row [nzGutter]="16" nzJustify="end" nzAlign="middle">
+      <div nz-col>
+        <button
+          nz-button
+          nzType="default"
+          type="button"
+          (click)="OnCloseForm()"
+        >
+          Cancel
+        </button>
+      </div>
+      <div nz-col>
+        <button nz-button nzType="primary" type="submit">Save</button>
+      </div>
+    </div>
+  </form>
+</nz-spin>

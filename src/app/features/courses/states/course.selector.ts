@@ -8,3 +8,8 @@ export const getValueShowFormOfCourse = createSelector(
   getCourseState,
   (state) => state.showForm
 );
+
+export const selectCourseLoaded = createSelector(
+  getCourseState,
+  (state) => state.loaded
+);

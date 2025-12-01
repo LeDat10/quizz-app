@@ -1,5 +1,9 @@
 import { Routes } from '@angular/router';
-import { UpdateCourseComponent } from './pages/update-course/update-course.component';
+import { provideState } from '@ngrx/store';
+import { COURSE_STATE } from '../../constants/Constants';
+import { courseReducer } from './states/course.reducer';
+import { provideEffects } from '@ngrx/effects';
+import { CourseEffect } from './states/course.effect';
 
 export const COURSES_ROUTES: Routes = [
   {
@@ -8,6 +12,10 @@ export const COURSES_ROUTES: Routes = [
       import('./pages/course-list/course-list.component').then(
         (m) => m.CourseListComponent
       ),
+    providers: [
+      provideState({ name: COURSE_STATE, reducer: courseReducer }),
+      provideEffects([CourseEffect]),
+    ],
   },
   {
     path: 'update/:courseId',

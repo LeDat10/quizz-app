@@ -1,0 +1,47 @@
+<div
+  class="fixed bottom-6 left-1/2 transform -translate-x-1/3 z-50 bg-white dark:bg-gray-800 shadow-xl rounded-full px-6 py-3 border border-gray-200 dark:border-gray-700 flex items-center space-x-4 animate-modalZoomIn max-w-[95vw]"
+  *ngIf="selectedQuantity > 0"
+>
+  <nz-space [nzAlign]="'center'" [nzSize]="16">
+    <span
+      *nzSpaceItem
+      class="text-sm font-semibold text-gray-700 dark:text-gray-200 border-r border-gray-300 dark:border-gray-600 pr-4 whitespace-nowrap"
+    >
+      Selected {{ selectedQuantity }}
+    </span>
+
+    @if(actionBarConfig.position){
+    <button *nzSpaceItem nz-button (click)="OnClickedPosition()">
+      Position
+    </button>
+    } @if(actionBarConfig.status) {
+    <nz-select
+      *nzSpaceItem
+      [ngModel]="'default'"
+      style="min-width: 110px"
+      (ngModelChange)="OnStatusChange($event)"
+    >
+      <nz-option nzValue="default" nzLabel="-- Status --"></nz-option>
+      @for (item of statusList; track $index) {
+      <nz-option
+        [nzValue]="item.value"
+        [nzLabel]="item.label"
+        [nzCustomContent]="true"
+      >
+        <nz-badge [nzStatus]="statusTypeMap[item.value]" />
+        {{ item.label }}
+      </nz-option>
+      }
+    </nz-select>
+    } @if(actionBarConfig.delete) {
+    <button *nzSpaceItem nz-button nzType="primary" nzDanger>
+      <nz-icon nzType="delete" nzTheme="outline" />
+      Delete
+    </button>
+    }
+
+    <button *nzSpaceItem nz-button nzType="text" (click)="OnCloseActionBar()">
+      <nz-icon nzType="close" nzTheme="outline" />
+    </button>
+  </nz-space>
+</div>

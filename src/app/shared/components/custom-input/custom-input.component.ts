@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, forwardRef, Input } from '@angular/core';
+import { Component, forwardRef, Input } from '@angular/core';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzFormModule } from 'ng-zorro-antd/form';
 import {
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
@@ -7,7 +9,7 @@ import {
 } from '@angular/forms';
 @Component({
   selector: 'app-custom-input',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, NzInputModule, NzFormModule],
   templateUrl: './custom-input.component.html',
   styleUrl: './custom-input.component.scss',
   providers: [
@@ -18,9 +20,7 @@ import {
     },
   ],
 })
-export class CustomInputComponent
-  implements ControlValueAccessor, AfterViewInit
-{
+export class CustomInputComponent implements ControlValueAccessor {
   value: string | number = '';
   isDisabled: boolean = false;
 
@@ -35,19 +35,6 @@ export class CustomInputComponent
   @Input() min: number = 0;
   @Input() max: number = 1000000000000000;
   @Input() step: number = 1;
-
-  ngAfterViewInit(): void {
-    console.log(
-      this.label,
-      this.type,
-      this.placeholder,
-      this.id,
-      this.name,
-      this.min,
-      this.max,
-      this.step
-    );
-  }
 
   writeValue(value: string | number): void {
     this.value = value;
