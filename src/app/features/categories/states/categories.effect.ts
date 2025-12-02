@@ -63,6 +63,10 @@ import {
   SUCCESS_MESSAGES,
   SUCCESS_TITLES,
 } from '../../../constants/success-message';
+import {
+  getAllCategoriesForDropDown,
+  setDropdownLoaded,
+} from '../../../shared/states/shared.action';
 @Injectable()
 export class categoriesEffect {
   action$: Actions = inject(Actions);
@@ -96,6 +100,7 @@ export class categoriesEffect {
         this.store.dispatch(setListLoading({ value: true }));
         return this.categoryService.changeCategoryStatus(action).pipe(
           map((response) => {
+            this.store.dispatch(setDropdownLoaded({ value: false }));
             this.notification.success(
               SUCCESS_TITLES.CHANGED_STATUS,
               SUCCESS_MESSAGES.CATEGORY_STATUS_UPDATED
@@ -174,6 +179,7 @@ export class categoriesEffect {
       ofType(updateCategorySuccess),
       tap(() => {
         this.store.dispatch(showForm({ value: false }));
+        this.store.dispatch(setDropdownLoaded({ value: false }));
         this.notification.success(
           SUCCESS_TITLES.UPDATED,
           SUCCESS_MESSAGES.CATEGORY_UPDATED
@@ -217,6 +223,7 @@ export class categoriesEffect {
       ofType(addCategorySuccess),
       tap(() => {
         this.store.dispatch(showForm({ value: false }));
+        this.store.dispatch(setDropdownLoaded({ value: false }));
         this.notification.success(
           SUCCESS_TITLES.CREATED,
           SUCCESS_MESSAGES.CATEGORY_CREATED
@@ -316,6 +323,7 @@ export class categoriesEffect {
     return this.action$.pipe(
       ofType(updateCategoryStatusMutipleSuccess),
       tap(() => {
+        this.store.dispatch(setDropdownLoaded({ value: false }));
         this.notification.success(
           SUCCESS_TITLES.UPDATED,
           SUCCESS_MESSAGES.CATEGORIES_STATUS_UPDATED

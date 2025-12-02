@@ -98,6 +98,9 @@
   [nzFooter]="null"
 >
   <ng-container *nzModalContent>
-    <app-course-form></app-course-form>
+    <app-course-form
+      [editMode]="editMode"
+      [courseId]="courseId"
+    ></app-course-form>
   </ng-container>
 </nz-modal>

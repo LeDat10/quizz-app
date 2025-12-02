@@ -5,6 +5,7 @@ import {
 } from '../interfaces/course.interface';
 import { Course } from '../../../Models/course.model';
 import { HttpErrorResponse } from '@angular/common/http';
+import { StatusType } from '../../../shared/enums/status.enum';
 
 export const showForm = createAction(
   '[course] show form',
@@ -59,5 +60,37 @@ export const getCoursesSucccess = createAction(
 
 export const getCoursesFailure = createAction(
   '[course] get courses failure',
+  props<{ error: HttpErrorResponse }>()
+);
+
+// change courses page
+export const changeCoursesPage = createAction(
+  '[course] change courses page',
+  props<{ queryParams: { limit?: number; page?: number } }>()
+);
+
+export const changeCoursesPageSuccess = createAction(
+  '[course] change courses page success',
+  props<{ coursesResponse: CoursesPaginationResponse }>()
+);
+
+export const changeCoursesPageFailure = createAction(
+  '[course] change courses page failure',
+  props<{ error: HttpErrorResponse }>()
+);
+
+// change course status
+export const changeCourseStatus = createAction(
+  '[course] change course status',
+  props<{ params: { id: string | number; status: StatusType } }>()
+);
+
+export const changeCourseStatusSuccess = createAction(
+  '[course] change course status success',
+  props<{ courseResponse: Course }>()
+);
+
+export const changeCourseStatusFailure = createAction(
+  '[course] change course status failure',
   props<{ error: HttpErrorResponse }>()
 );

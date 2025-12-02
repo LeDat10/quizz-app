@@ -8,3 +8,13 @@ export const getCloudinarySignatureSelector = createSelector(
   getSharedState,
   (state) => state.cloudinarySignature
 );
+
+export const getIsDropdownLoadedSelector = createSelector(
+  getSharedState,
+  (state) => state.isDropdownLoaded
+);
+
+export const getAllCategoriesForDropDownSelector = createSelector(
+  getSharedState,
+  (state) => state.allCategoriesForDropdown
+);

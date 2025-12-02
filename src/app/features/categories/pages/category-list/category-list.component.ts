@@ -28,11 +28,6 @@ export class CategoryListComponent implements OnInit {
   router: Router = inject(Router);
   ngOnInit(): void {
     this.store.dispatch(getCategories());
-    this.store.select(getCategoriesSelector).subscribe({
-      next: (category) => {
-        console.log(category);
-      },
-    });
   }
 
   OnAddCategory() {

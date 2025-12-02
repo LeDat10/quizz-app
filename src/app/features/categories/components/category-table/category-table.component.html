@@ -18,13 +18,14 @@
           [nzWidth]="'100px'"
           [nzIndeterminate]="indeterminate"
           (nzCheckedChange)="onAllChecked($event)"
+          nzLeft
         ></th>
 
         <th>Image</th>
         <th nzShowSort>Title</th>
         <th nzShowSort>Position</th>
         <th>Status</th>
-        <th>Action</th>
+        <th nzWidth="150px" nzRight>Action</th>
       </tr>
     </thead>
 
@@ -34,6 +35,7 @@
         <td
           [nzChecked]="setOfCheckedId.has(data.id)"
           (nzCheckedChange)="onItemChecked(data.id, $event)"
+          nzLeft
         ></td>
         <td>
           <img
@@ -59,7 +61,7 @@
             }}</nz-tag>
           </button>
         </td>
-        <td>
+        <td nzRight>
           <div nz-row>
             <div nz-col nz-tooltip nzTooltipTitle="Detail">
               <button nz-button nzType="text">

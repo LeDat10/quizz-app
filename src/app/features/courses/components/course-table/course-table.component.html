@@ -1,0 +1,75 @@
+<nz-spin [nzSpinning]="listLoading$ | async">
+  <nz-table [nzData]="courses" nzShowPagination>
+    <thead>
+      <tr>
+        <th [nzChecked]="checked" [nzWidth]="'100px'" nzLeft></th>
+        <th>Image</th>
+        <th>Title</th>
+        <th>Position</th>
+        <th>Status</th>
+        <th>Type</th>
+        <th>Category</th>
+        <th>Class Code</th>
+        <th>action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (item of courses; track $index) {
+      <tr>
+        <td [nzChecked]="false" nzLeft></td>
+        <td>
+          <img
+            [src]="item.thumbnail"
+            [alt]="item.title"
+            class="w-17 h-17 object-cover"
+          />
+        </td>
+        <td>{{ item.title }}</td>
+        <td>
+          <nz-input-number
+            [(ngModel)]="item.position"
+            nzMin="1"
+          ></nz-input-number>
+        </td>
+        <td>
+          <button
+            class="cursor-pointer"
+            (click)="OnChangeStatus({ id: item.id, status: item.status })"
+          >
+            <nz-tag [nzColor]="statusTypeMap[item.status]">
+              {{ item.status }}
+            </nz-tag>
+          </button>
+        </td>
+        <td>
+          <nz-tag [nzColor]="courseTypeColor[item.typeCourse]">{{
+            item.typeCourse
+          }}</nz-tag>
+        </td>
+        <td>{{ item.category?.title }}</td>
+        <td>{{ item.courseCode }}</td>
+        <td>
+          <div nz-row>
+            <div nz-col nz-tooltip nzTooltipTitle="Detail">
+              <button nz-button nzType="text">
+                <nz-icon nzType="eye" nzTheme="outline" />
+              </button>
+            </div>
+            <div nz-col nz-tooltip nzTooltipTitle="Edit">
+              <button nz-button nzType="link">
+                <nz-icon nzType="edit" nzTheme="outline" />
+              </button>
+            </div>
+            <div nz-col nz-tooltip nzTooltipTitle="Delete">
+              <button nz-button nzType="text" nzDanger>
+                <nz-icon nzType="delete" nzTheme="outline" />
+              </button>
+            </div>
+          </div>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </nz-table>
+</nz-spin>

@@ -6,3 +6,8 @@ export const URL = '';
 export const CATEGORY_ENTITY = 'Category';
 export const SHARED_STATE = 'shared';
 export const DEFAULT_LIMIT = 10;
+
+export const CourseTypeColor: Record<string, string> = {
+  free: 'green',
+  premium: 'gold',
+};

@@ -8,6 +8,7 @@ import {
   CoursesPaginationResponse,
 } from '../interfaces/course.interface';
 import { DEFAULT_LIMIT } from '../../../constants/Constants';
+import { StatusType } from '../../../shared/enums/status.enum';
 
 @Injectable({ providedIn: 'root' })
 export class CourseService {
@@ -25,6 +26,18 @@ export class CourseService {
     const { page = 1, limit = DEFAULT_LIMIT } = queryParams;
     return this.http.get<CoursesPaginationResponse>(
       `${this.courseApi}?page=${page}&limit=${limit}`
+    );
+  }
+
+  changeCourseStatus(params: {
+    id: number | string;
+    status: StatusType;
+  }): Observable<CourseResponse> {
+    return this.http.patch<CourseResponse>(
+      `${this.courseApi}/${params.id}/status`,
+      {
+        status: params.status,
+      }
     );
   }
 }

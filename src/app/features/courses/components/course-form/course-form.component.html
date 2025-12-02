@@ -1,4 +1,4 @@
-<nz-spin [nzSpinning]="false">
+<nz-spin [nzSpinning]="actionLoading">
   <form
     nz-form
     nzLayout="vertical"
@@ -44,7 +44,8 @@
         <nz-form-label nzFor="category"> Category </nz-form-label>
         <nz-form-control>
           <nz-select formControlName="categoryId" id="category">
-            <nz-option nzLabel="Draft" nzValue="draft"></nz-option>
+            @for(item of (allCategoriesForDropDown$ | async); track $index) {
+            <nz-option [nzLabel]="item.title" [nzValue]="item.id"></nz-option>}
           </nz-select>
         </nz-form-control>
       </nz-form-item>
