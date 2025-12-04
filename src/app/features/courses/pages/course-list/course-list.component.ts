@@ -32,7 +32,6 @@ export class CourseListComponent implements OnInit {
 
   OnAddCourse() {
     this.store.dispatch(showForm({ value: true }));
-    this.store.dispatch(getAllCategoriesForDropDown());
     this.store.dispatch(
       getCloudinarySignature({
         cloudinary: {
@@ -41,6 +40,5 @@ export class CourseListComponent implements OnInit {
         },
       })
     );
-    this.router.navigateByUrl(`admin/courses?id=${null}&editMode=${false}`);
   }
 }

@@ -9,10 +9,15 @@ import {
   changeCourseStatusSuccess,
   getCoursesFailure,
   getCoursesSucccess,
+  loadCourseForEditFailure,
+  loadCourseForEditSuccess,
   setActionLoading,
   setDetailLoading,
   setListLoading,
+  setSelectedCourse,
   showForm,
+  updateCourseFailure,
+  updateCourseSuccess,
 } from './course.actions';
 
 export const courseReducer = createReducer(
@@ -107,5 +112,44 @@ export const courseReducer = createReducer(
       listLoading: false,
       error: action.error,
     };
-  })
+  }),
+
+  // update course
+  on(updateCourseSuccess, (state, action) => {
+    return courseAdapter.updateOne(
+      {
+        id: action.courseResponse.id,
+        changes: action.courseResponse,
+      },
+      {
+        ...state,
+        actionLoading: false,
+      }
+    );
+  }),
+  on(updateCourseFailure, (state, action) => {
+    return {
+      ...state,
+      error: action.error,
+      actionLoading: false,
+    };
+  }),
+
+  // load course for edit
+  on(loadCourseForEditSuccess, (state, action) => ({
+    ...state,
+    actionLoading: false,
+    selectedCourse: action.courseResponse,
+  })),
+  on(loadCourseForEditFailure, (state, action) => ({
+    ...state,
+    actionLoading: false,
+    error: action.error,
+  })),
+
+  // set selected course
+  on(setSelectedCourse, (state, action) => ({
+    ...state,
+    selectedCourse: action.selectedCourse,
+  }))
 );

@@ -17,25 +17,41 @@ export const COURSES_ROUTES: Routes = [
       provideEffects([CourseEffect]),
     ],
   },
+  // {
+  //   path: 'update/:courseId',
+  //   loadComponent: () =>
+  //     import('./pages/update-course/update-course.component').then(
+  //       (m) => m.UpdateCourseComponent
+  //     ),
+  //   children: [
+  //     {
+  //       path: '',
+  //       loadComponent: () =>
+  //         import(
+  //           './components/update-course-form/update-course-form.component'
+  //         ).then((m) => m.UpdateCourseFormComponent),
+  //     },
+  //     {
+  //       path: 'content',
+  //       loadComponent: () =>
+  //         import('./pages/content/content.component').then(
+  //           (m) => m.ContentComponent
+  //         ),
+  //     },
+  //   ],
+  // },
   {
-    path: 'update/:courseId',
+    path: ':courseId',
     loadComponent: () =>
-      import('./pages/update-course/update-course.component').then(
-        (m) => m.UpdateCourseComponent
+      import('./pages/course-management/course-management.component').then(
+        (m) => m.CourseManagementComponent
       ),
     children: [
       {
-        path: '',
+        path: 'update',
         loadComponent: () =>
-          import(
-            './components/update-course-form/update-course-form.component'
-          ).then((m) => m.UpdateCourseFormComponent),
-      },
-      {
-        path: 'content',
-        loadComponent: () =>
-          import('./pages/content/content.component').then(
-            (m) => m.ContentComponent
+          import('./pages/update-course/update-course.component').then(
+            (m) => m.UpdateCourseComponent
           ),
       },
     ],

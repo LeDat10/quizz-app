@@ -115,7 +115,6 @@ export class CategoryTableComponent implements OnInit {
 
   OnCategoryEdit(id: string | number) {
     this.store.dispatch(showForm({ value: true }));
-    this.router.navigateByUrl(`admin/category?id=${id}&edit=${true}`);
     this.store.dispatch(loadCategoryForEdit({ categoryId: id }));
   }
 

@@ -5,6 +5,7 @@ import { CustomTextareaComponent } from '../../../../shared/components/custom-te
 import { CustomUploadImageComponent } from '../../../../shared/components/custom-upload-image/custom-upload-image.component';
 import { CustomButtonComponent } from '../../../../shared/components/custom-button/custom-button.component';
 import { OptionType } from '../../../../core/interfaces/custom-select.interface';
+import { CourseFormComponent } from '../course-form/course-form.component';
 
 @Component({
   selector: 'app-update-course-form',
@@ -14,6 +15,7 @@ import { OptionType } from '../../../../core/interfaces/custom-select.interface'
     CustomTextareaComponent,
     CustomUploadImageComponent,
     CustomButtonComponent,
+    CourseFormComponent,
   ],
   templateUrl: './update-course-form.component.html',
   styleUrl: './update-course-form.component.scss',

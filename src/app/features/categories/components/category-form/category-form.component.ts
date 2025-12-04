@@ -1,11 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  inject,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -29,6 +22,7 @@ import {
 import { CommonModule } from '@angular/common';
 import {
   addCategory,
+  setSelectedCategory,
   showForm,
   updateCategory,
 } from '../../states/categories.actions';
@@ -45,14 +39,13 @@ import {
   NzUploadModule,
   NzUploadXHRArgs,
 } from 'ng-zorro-antd/upload';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { NzButtonComponent } from 'ng-zorro-antd/button';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzSpinComponent } from 'ng-zorro-antd/spin';
 import { CloudinarySignature } from '../../../../shared/interfaces/cloudinary.interface';
 import { getCloudinarySignatureSelector } from '../../../../shared/states/shared.selector';
 import { deleteCloudinaryFile } from '../../../../shared/states/shared.action';
-import { getQueryParams } from '../../../../store/router/router.selector';
 import { Category } from '../../../../Models/category.model';
 import {
   extractFileNameFromUrl,
@@ -100,8 +93,6 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
   showForm: boolean = false;
   fileList: NzUploadFile[] = [];
   cloudinaryData: CloudinarySignature | null = null;
-  isEditMode: boolean = false;
-  categoryId: string | number = '';
   selectedCategory: Category | null = null;
   selectedCategorySubscription: Subscription | null = null;
   ExtractFileNameFromUrl = extractFileNameFromUrl;
@@ -155,17 +146,7 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
       thumbnail: new FormControl(null),
     });
 
-    this.store.select(getQueryParams).subscribe({
-      next: (queryParams) => {
-        if (queryParams['edit']) {
-          this.isEditMode = JSON.parse(queryParams['edit']);
-        }
-        if (queryParams['id']) {
-          this.categoryId = JSON.parse(queryParams['id']);
-        }
-        this.SubsribeToSelectedCategory();
-      },
-    });
+    this.SubsribeToSelectedCategory();
   }
 
   handlePreview = async (
@@ -326,10 +307,10 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
         })
       );
 
-      if (this.isEditMode && this.categoryId) {
+      if (this.selectedCategory) {
         this.store.dispatch(
           updateCategory({
-            id: this.categoryId,
+            id: this.selectedCategory.id,
             updateCategoryRequest: { thumbnail: '' },
           })
         );
@@ -348,43 +329,40 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
   };
 
   SubsribeToSelectedCategory() {
-    if (this.isEditMode) {
-      this.selectedCategorySubscription = this.store
-        .select(getSelectedCategorySelector)
-        .subscribe({
-          next: (category) => {
-            this.selectedCategory = category;
-            if (category) {
-              this.categoryForm.patchValue(category);
-              if (category.thumbnail) {
-                this.fileList = [
-                  {
-                    uid: '-1',
-                    name: extractFileNameFromUrl(category.thumbnail),
-                    status: 'done',
-                    url: category.thumbnail,
-                    thumbUrl: category.thumbnail,
-                    response: {
-                      public_id: extractPublicId(category.thumbnail),
-                    },
+    this.selectedCategorySubscription = this.store
+      .select(getSelectedCategorySelector)
+      .subscribe({
+        next: (category) => {
+          this.selectedCategory = category;
+          console.log(category);
+          if (category) {
+            this.categoryForm.patchValue(category);
+            if (category.thumbnail) {
+              this.fileList = [
+                {
+                  uid: '-1',
+                  name: extractFileNameFromUrl(category.thumbnail),
+                  status: 'done',
+                  url: category.thumbnail,
+                  thumbUrl: category.thumbnail,
+                  response: {
+                    public_id: extractPublicId(category.thumbnail),
                   },
-                ];
-              }
-            } else {
-              this.ResetForm();
+                },
+              ];
             }
-          },
-        });
-    } else {
-      this.ResetForm();
-    }
+          } else {
+            this.ResetForm();
+          }
+        },
+      });
   }
 
   OnSubmitted() {
-    if (this.isEditMode) {
+    if (this.selectedCategory) {
       this.store.dispatch(
         updateCategory({
-          id: this.categoryId,
+          id: this.selectedCategory.id,
           updateCategoryRequest: this.categoryForm.value,
         })
       );
@@ -393,20 +371,20 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
         addCategory({ addCategoryRequest: this.categoryForm.value })
       );
     }
+    this.ResetForm();
   }
 
   ResetForm() {
     this.categoryForm.reset({ status: 'draft' });
     this.fileList = [];
-
-    this.isEditMode = false;
-    this.categoryId = '';
     this.selectedCategory = null;
+    this.store.dispatch(setSelectedCategory({ selectedCategory: null }));
   }
 
   ngOnDestroy(): void {
     this.showFormSubscription.unsubscribe();
     this.actionLoadingSubscription?.unsubscribe();
     this.detailLoadingSubscription?.unsubscribe();
+    this.ResetForm();
   }
 }

@@ -4,3 +4,10 @@ export const statusTypeMapFull: Record<string, string> = {
   inactive: 'error',
   archived: 'processing',
 };
+
+export const StatusTextMap: Record<string, string> = {
+  draft: 'Draft',
+  published: 'Published',
+  inactive: 'Inactive',
+  archived: 'Archived',
+};

@@ -19,6 +19,7 @@ export interface CourseState extends EntityState<Course> {
   actionLoading: boolean;
   listLoading: boolean;
   loaded: boolean;
+  selectedCourse: Course | null;
   error: HttpErrorResponse | null;
 }
 
@@ -30,5 +31,6 @@ export const initialState: CourseState = courseAdapter.getInitialState({
   actionLoading: false,
   listLoading: false,
   loaded: false,
+  selectedCourse: null,
   error: null,
 });

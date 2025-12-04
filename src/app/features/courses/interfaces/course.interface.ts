@@ -18,6 +18,16 @@ export interface AddCourseRequest {
   categoryId?: number | string;
 }
 
+export interface UpdateCourseRequest {
+  title?: string;
+  description?: string;
+  thumbnail?: string;
+  typeCourse?: TypeCourse;
+  status?: StatusType;
+  position?: number;
+  categoryId?: number | string;
+}
+
 export interface MetaInfo {
   totalItems: number;
   itemsPerPage: number;

@@ -176,3 +176,9 @@ export const loadCategoryForEditFailure = createAction(
   '[category] load category for edit failure',
   props<{ error: HttpErrorResponse }>()
 );
+
+// set selected category
+export const setSelectedCategory = createAction(
+  '[category] set selected category',
+  props<{ selectedCategory: Category | null }>()
+);

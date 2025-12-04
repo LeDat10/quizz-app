@@ -14,9 +14,15 @@ import {
   getCourses,
   getCoursesFailure,
   getCoursesSucccess,
+  loadCourseForEdit,
+  loadCourseForEditFailure,
+  loadCourseForEditSuccess,
   setActionLoading,
   setListLoading,
   showForm,
+  updateCourse,
+  updateCourseFailure,
+  updateCourseSuccess,
 } from './course.actions';
 import {
   catchError,
@@ -24,12 +30,17 @@ import {
   filter,
   map,
   of,
+  switchMap,
   tap,
   withLatestFrom,
 } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../store/app.state';
-import { getCourseMetaSelector, selectCourseLoaded } from './course.selector';
+import {
+  getCourseMetaSelector,
+  getCoursesSelector,
+  selectCourseLoaded,
+} from './course.selector';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import {
@@ -133,6 +144,68 @@ export class CourseEffect {
             return changeCourseStatusSuccess({ courseResponse: response.data });
           }),
           catchError((error) => of(changeCourseStatusFailure(error)))
+        );
+      })
+    );
+  });
+
+  // update course
+  updateCourse$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(updateCourse),
+      switchMap((action) => {
+        this.store.dispatch(setActionLoading({ value: true }));
+        return this.courseService.updateCourse(action.params).pipe(
+          map((response) => {
+            return updateCourseSuccess({ courseResponse: response.data });
+          }),
+          catchError((error) => of(updateCourseFailure({ error })))
+        );
+      })
+    );
+  });
+
+  updateCourseSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(updateCourseSuccess),
+      tap(() => {
+        this.store.dispatch(showForm({ value: false }));
+        this.notification.success(
+          SUCCESS_TITLES.UPDATED,
+          SUCCESS_MESSAGES.COURSE_UPDATED
+        );
+      }),
+      withLatestFrom(this.store.select(getCourseMetaSelector)),
+      map(([_, meta]) =>
+        changeCoursesPage({
+          queryParams: {
+            limit: meta?.itemsPerPage || DEFAULT_LIMIT,
+            page: meta?.currentPage || 1,
+          },
+        })
+      )
+    );
+  });
+
+  // load course for edit
+  loadCourseForEdit$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(loadCourseForEdit),
+      withLatestFrom(this.store.select(getCoursesSelector)),
+      switchMap(([action, courses]) => {
+        this.store.dispatch(setActionLoading({ value: true }));
+        const courseStore = courses.find(
+          (course) => course.id === action.courseId
+        );
+        if (courseStore) {
+          return of(loadCourseForEditSuccess({ courseResponse: courseStore }));
+        }
+
+        return this.courseService.getCourseDetail(action.courseId).pipe(
+          map((reponse) =>
+            loadCourseForEditSuccess({ courseResponse: reponse.data })
+          ),
+          catchError((error) => of(loadCourseForEditFailure({ error })))
         );
       })
     );

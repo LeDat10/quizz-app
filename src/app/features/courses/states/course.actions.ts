@@ -2,6 +2,7 @@ import { createAction, props } from '@ngrx/store';
 import {
   AddCourseRequest,
   CoursesPaginationResponse,
+  UpdateCourseRequest,
 } from '../interfaces/course.interface';
 import { Course } from '../../../Models/course.model';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -93,4 +94,44 @@ export const changeCourseStatusSuccess = createAction(
 export const changeCourseStatusFailure = createAction(
   '[course] change course status failure',
   props<{ error: HttpErrorResponse }>()
+);
+
+// update course
+export const updateCourse = createAction(
+  '[course] update course',
+  props<{
+    params: { id: string | number; updateCourseRequest: UpdateCourseRequest };
+  }>()
+);
+
+export const updateCourseSuccess = createAction(
+  '[course] update course success',
+  props<{ courseResponse: Course }>()
+);
+
+export const updateCourseFailure = createAction(
+  '[course] update course failure',
+  props<{ error: HttpErrorResponse }>()
+);
+
+// load course for edit
+export const loadCourseForEdit = createAction(
+  '[course] load course for edit',
+  props<{ courseId: string | number }>()
+);
+
+export const loadCourseForEditSuccess = createAction(
+  '[course] load course for edit success',
+  props<{ courseResponse: Course }>()
+);
+
+export const loadCourseForEditFailure = createAction(
+  '[course] load course for edit failure',
+  props<{ error: HttpErrorResponse }>()
+);
+
+// set selected course
+export const setSelectedCourse = createAction(
+  '[course] set selected course',
+  props<{ selectedCourse: Course | null }>()
 );

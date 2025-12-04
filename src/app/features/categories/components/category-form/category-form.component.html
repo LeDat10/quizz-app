@@ -97,7 +97,7 @@
 
 <nz-modal
   [(nzVisible)]="showForm"
-  [nzTitle]="isEditMode ? 'Edit Category' : 'Add Category'"
+  [nzTitle]="selectedCategory ? 'Edit Category' : 'Add Category'"
   (nzOnCancel)="OnCloseForm()"
   nzWidth="60%"
   [nzFooter]="null"

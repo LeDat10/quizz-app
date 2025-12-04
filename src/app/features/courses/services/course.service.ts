@@ -9,6 +9,7 @@ import {
 } from '../interfaces/course.interface';
 import { DEFAULT_LIMIT } from '../../../constants/Constants';
 import { StatusType } from '../../../shared/enums/status.enum';
+import { UpdateCategoryRequest } from '../../categories/interfaces/category.interface';
 
 @Injectable({ providedIn: 'root' })
 export class CourseService {
@@ -39,5 +40,19 @@ export class CourseService {
         status: params.status,
       }
     );
+  }
+
+  updateCourse(params: {
+    id: string | number;
+    updateCourseRequest: UpdateCategoryRequest;
+  }): Observable<CourseResponse> {
+    return this.http.patch<CourseResponse>(
+      `${this.courseApi}/${params.id}`,
+      params.updateCourseRequest
+    );
+  }
+
+  getCourseDetail(id: string | number): Observable<CourseResponse> {
+    return this.http.get<CourseResponse>(`${this.courseApi}/${id}`);
   }
 }

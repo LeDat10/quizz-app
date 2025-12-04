@@ -16,6 +16,7 @@ import {
   setActionLoading,
   setDetailLoading,
   setListLoading,
+  setSelectedCategory,
   showForm,
   updateCategoryFailure,
   updateCategoryPositionMultipleSuccess,
@@ -209,5 +210,11 @@ export const categoryReducer = createReducer(
       error: action.error,
       detailLoading: false,
     };
-  })
+  }),
+
+  // selected category
+  on(setSelectedCategory, (state, action) => ({
+    ...state,
+    selectedCategory: action.selectedCategory,
+  }))
 );

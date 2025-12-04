@@ -1,4 +1,11 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 import { NzSpinComponent } from 'ng-zorro-antd/spin';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import {
@@ -36,11 +43,24 @@ import {
   getAllCategoriesForDropDownSelector,
   getCloudinarySignatureSelector,
 } from '../../../../shared/states/shared.selector';
-import { addCourse, showForm } from '../../states/course.actions';
-import { deleteCloudinaryFile } from '../../../../shared/states/shared.action';
+import {
+  addCourse,
+  setSelectedCourse,
+  showForm,
+  updateCourse,
+} from '../../states/course.actions';
+import {
+  deleteCloudinaryFile,
+  getAllCategoriesForDropDown,
+} from '../../../../shared/states/shared.action';
 import { getActionLoadingSelector } from '../../states/course.selector';
 import { CommonModule } from '@angular/common';
 import { CategoryForDropDown } from '../../../../shared/interfaces/category.interface';
+import { Course } from '../../../../Models/course.model';
+import {
+  extractFileNameFromUrl,
+  extractPublicId,
+} from '../../../../shared/helpers/file.helper';
 @Component({
   selector: 'app-course-form',
   imports: [
@@ -61,20 +81,38 @@ import { CategoryForDropDown } from '../../../../shared/interfaces/category.inte
   templateUrl: './course-form.component.html',
   styleUrl: './course-form.component.scss',
 })
-export class CourseFormComponent implements OnInit, OnDestroy {
+export class CourseFormComponent implements OnInit, OnDestroy, OnChanges {
   courseForm!: FormGroup;
   previewImage: string | undefined = '';
   previewVisible: boolean = false;
   cloudinaryData: CloudinarySignature | null = null;
   fileList: NzUploadFile[] = [];
   actionLoading: boolean = false;
-  @Input() editMode: boolean = false;
-  @Input() courseId: number | string = '';
+  @Input() selectedCourse: Course | null = null;
   cloudDinarySignatureSubscription: Subscription | null = null;
   actionLoadingSubscription: Subscription | null = null;
   allCategoriesForDropDown$: Observable<CategoryForDropDown[] | null> | null =
     null;
-  constructor(private readonly store: Store<AppState>) {}
+
+  constructor(private readonly store: Store<AppState>) {
+    this.store.dispatch(getAllCategoriesForDropDown());
+
+    this.courseForm = new FormGroup({
+      title: new FormControl(null, [Validators.required]),
+      position: new FormControl(null),
+      status: new FormControl(StatusType.DRAFT),
+      typeCourse: new FormControl(CourseType.FREE),
+      categoryId: new FormControl(null),
+      description: new FormControl(null),
+      thumbnail: new FormControl(null),
+    });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedCourse']) {
+      this.patchForm();
+    }
+  }
 
   ngOnInit(): void {
     this.cloudDinarySignatureSubscription = this.store
@@ -96,24 +134,40 @@ export class CourseFormComponent implements OnInit, OnDestroy {
     this.allCategoriesForDropDown$ = this.store.select(
       getAllCategoriesForDropDownSelector
     );
-
-    this.courseForm = new FormGroup({
-      title: new FormControl(null, [Validators.required]),
-      position: new FormControl(null),
-      status: new FormControl(StatusType.DRAFT),
-      typeCourse: new FormControl(CourseType.FREE),
-      categoryId: new FormControl(null),
-      description: new FormControl(null),
-      thumbnail: new FormControl(null),
-    });
-
-    this.SubsribeToSelectedCourse();
   }
 
   ngOnDestroy(): void {
     this.cloudDinarySignatureSubscription?.unsubscribe();
     this.actionLoadingSubscription?.unsubscribe();
-    this.ResetForm();
+  }
+
+  patchForm() {
+    if (this.selectedCourse) {
+      this.courseForm.patchValue(this.selectedCourse);
+
+      if (this.selectedCourse.thumbnail) {
+        this.fileList = [
+          {
+            uid: '-1',
+            name: extractFileNameFromUrl(this.selectedCourse.thumbnail),
+            status: 'done',
+            url: this.selectedCourse.thumbnail,
+            thumbUrl: this.selectedCourse.thumbnail,
+            response: {
+              public_id: extractPublicId(this.selectedCourse.thumbnail),
+            },
+          },
+        ];
+      }
+
+      if (this.selectedCourse.category) {
+        this.courseForm.patchValue({
+          categoryId: this.selectedCourse.category.id,
+        });
+      }
+    } else {
+      this.ResetForm();
+    }
   }
 
   handlePreview = async (
@@ -167,22 +221,36 @@ export class CourseFormComponent implements OnInit, OnDestroy {
       status: StatusType.DRAFT,
       typeCourse: CourseType.FREE,
     });
-    this.fileList = [];
 
-    this.editMode = false;
-    this.courseId = '';
+    this.fileList = [];
   }
 
   SubsribeToSelectedCourse() {
-    if (this.editMode) {
+    console.log(this.selectedCourse);
+    if (this.selectedCourse) {
+      this.courseForm.patchValue(this.selectedCourse);
+      if (this.selectedCourse.thumbnail) {
+        this.fileList = [
+          {
+            uid: '-1',
+            name: extractFileNameFromUrl(this.selectedCourse.thumbnail),
+            status: 'done',
+            url: this.selectedCourse.thumbnail,
+            thumbUrl: this.selectedCourse.thumbnail,
+            response: {
+              public_id: extractPublicId(this.selectedCourse.thumbnail),
+            },
+          },
+        ];
+      }
+      if (this.selectedCourse.category) {
+        this.courseForm.patchValue({
+          categoryId: this.selectedCourse.category.id,
+        });
+      }
     } else {
       this.ResetForm();
     }
-  }
-
-  LoadCourseDataForEdit() {
-    // load dữ liệu courseId vào form
-    console.log('Loading...', this.courseId);
   }
 
   OnCloseForm() {
@@ -193,9 +261,18 @@ export class CourseFormComponent implements OnInit, OnDestroy {
   }
 
   OnSubmitted() {
-    if (this.editMode) {
+    if (this.selectedCourse) {
+      this.store.dispatch(
+        updateCourse({
+          params: {
+            id: this.selectedCourse.id,
+            updateCourseRequest: this.courseForm.value,
+          },
+        })
+      );
     } else {
       this.store.dispatch(addCourse({ addCourse: this.courseForm.value }));
+      this.ResetForm();
     }
   }
 }

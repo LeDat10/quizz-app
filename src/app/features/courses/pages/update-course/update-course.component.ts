@@ -1,27 +1,23 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { RouterOutlet, RouterLink } from '@angular/router';
 import { AppState } from '../../../../store/app.state';
 import { Store } from '@ngrx/store';
-import { getRouterUrl } from '../../../../store/router/router.selector';
 import { Observable } from 'rxjs';
+import { selectedCourseSelector } from '../../states/course.selector';
+import { Course } from '../../../../Models/course.model';
+import { CourseFormComponent } from '../../components/course-form/course-form.component';
 
 @Component({
   selector: 'app-update-course',
-  imports: [RouterOutlet, RouterLink, CommonModule],
+  imports: [CommonModule, CourseFormComponent],
   templateUrl: './update-course.component.html',
   styleUrl: './update-course.component.scss',
 })
 export class UpdateCourseComponent implements OnInit {
-  navItems = [
-    { content: 'Info', link: '/admin/courses/update/1' },
-    { content: 'Content', link: '/admin/courses/update/1/content' },
-  ];
-  store: Store<AppState> = inject(Store);
-
-  url$: Observable<string> | null = null;
+  store: Store<AppState> = inject(Store<AppState>);
+  selectedCourse$: Observable<Course | null> | null = null;
 
   ngOnInit(): void {
-    this.url$ = this.store.select(getRouterUrl);
+    this.selectedCourse$ = this.store.select(selectedCourseSelector);
   }
 }

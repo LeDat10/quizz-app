@@ -1,4 +1,4 @@
-<div class="space-y-6">
+<!-- <div class="space-y-6">
   <div class="p-4 bg-white rounded-lg shadow-sm">
     <div
       class="flex flex-col md:flex-row md:justify-between md:items-start gap-4"
@@ -26,4 +26,10 @@
   </div>
 
   <router-outlet></router-outlet>
+</div> -->
+
+@if(selectedCourse$ | async) {
+<div>
+  <app-course-form [selectedCourse]="selectedCourse$ | async"></app-course-form>
 </div>
+}

@@ -30,24 +30,10 @@ export class AddCourseFormComponent implements OnInit {
   store: Store<AppState> = inject(Store);
   showForm: boolean = false;
   timer: ReturnType<typeof setTimeout> | null = null;
-  queryParamsSubscription: Subscription | null = null;
-  courseId: number | string = '';
-  editMode: boolean = false;
   ngOnInit(): void {
     this.store.select(getValueShowFormOfCourse).subscribe({
       next: (showForm) => {
         this.showForm = showForm;
-      },
-    });
-
-    this.queryParamsSubscription = this.store.select(getQueryParams).subscribe({
-      next: (queryParams) => {
-        if (queryParams['edit']) {
-          this.editMode = JSON.parse(queryParams['edit']);
-        }
-        if (queryParams['id']) {
-          this.courseId = JSON.parse(queryParams['id']);
-        }
       },
     });
   }

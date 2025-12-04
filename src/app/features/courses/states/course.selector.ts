@@ -34,3 +34,9 @@ export const getCourseMetaSelector = createSelector(
   getCourseState,
   (state) => state.meta
 );
+
+// get selected course
+export const selectedCourseSelector = createSelector(
+  getCourseState,
+  (state) => state.selectedCourse
+);

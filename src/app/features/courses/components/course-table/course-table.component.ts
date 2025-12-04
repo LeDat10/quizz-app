@@ -19,7 +19,13 @@ import { CourseTypeColor } from '../../../../constants/Constants';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { CommonModule } from '@angular/common';
 import { StatusType } from '../../../../shared/enums/status.enum';
-import { changeCourseStatus } from '../../states/course.actions';
+import {
+  changeCourseStatus,
+  loadCourseForEdit,
+  showForm,
+} from '../../states/course.actions';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-course-table',
   imports: [
@@ -38,6 +44,7 @@ import { changeCourseStatus } from '../../states/course.actions';
 })
 export class CourseTableComponent implements OnInit, OnDestroy {
   store: Store<AppState> = inject(Store<AppState>);
+  router: Router = inject(Router);
   courses: Course[] = [];
   statusTypeMap = statusTypeMapFull;
   courseTypeColor = CourseTypeColor;
@@ -82,5 +89,10 @@ export class CourseTableComponent implements OnInit, OnDestroy {
 
     params.status = statusRequest;
     this.store.dispatch(changeCourseStatus({ params }));
+  }
+
+  OnEditCourse(id: string | number) {
+    // this.store.dispatch(loadCourseForEdit({ courseId: id }));
+    this.router.navigateByUrl(`/admin/courses/${id}/update`);
   }
 }
