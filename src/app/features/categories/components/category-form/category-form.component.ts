@@ -1,5 +1,6 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import {
+  FormBuilder,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
@@ -15,7 +16,6 @@ import { Store } from '@ngrx/store';
 import { AppState } from '../../../../store/app.state';
 import {
   getCategoryActionLoadingSelector,
-  getCategoryDetailLoadingSelector,
   getSelectedCategorySelector,
   getValueShowFormOfCategory,
 } from '../../states/categories.selector';
@@ -39,13 +39,24 @@ import {
   NzUploadModule,
   NzUploadXHRArgs,
 } from 'ng-zorro-antd/upload';
-import { Subscription } from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  map,
+  Observable,
+  of,
+  Subject,
+  Subscription,
+  switchMap,
+  take,
+  takeUntil,
+  tap,
+} from 'rxjs';
 import { NzButtonComponent } from 'ng-zorro-antd/button';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzSpinComponent } from 'ng-zorro-antd/spin';
-import { CloudinarySignature } from '../../../../shared/interfaces/cloudinary.interface';
 import { getCloudinarySignatureSelector } from '../../../../shared/states/shared.selector';
-import { deleteCloudinaryFile } from '../../../../shared/states/shared.action';
 import { Category } from '../../../../Models/category.model';
 import {
   extractFileNameFromUrl,
@@ -55,6 +66,15 @@ import {
   getBase64,
   handleDownloadHelper,
 } from '../../../../shared/helpers/image.helper';
+import { CloudinaryService } from '../../../../shared/services/cloudinary.service';
+import {
+  AddCategoryRequest,
+  ComponentState,
+  UpdateCategoryRequest,
+} from '../../interfaces/category.interface';
+import { StatusType } from '../../../../shared/enums/status.enum';
+import { HttpEventType } from '@angular/common/http';
+import { CategoryService } from '../../services/category.service';
 
 @Component({
   selector: 'app-category-form',
@@ -83,71 +103,250 @@ import {
 })
 export class CategoryFormComponent implements OnInit, OnDestroy {
   store: Store<AppState> = inject(Store);
-  showFormSubscription!: Subscription;
-  loading: boolean = false;
-  actionLoadingSubscription: Subscription | null = null;
-  detailLoadingSubscription: Subscription | null = null;
-  previewVisible: boolean = false;
-  previewImage: string | undefined = '';
-  categoryForm!: FormGroup;
-  showForm: boolean = false;
+  private readonly fb = inject(FormBuilder);
+  private readonly cloudinaryService = inject(CloudinaryService);
+  private readonly categoryService = inject(CategoryService);
+  private readonly destroy$ = new Subject<void>();
+
+  readonly state$ = new BehaviorSubject<ComponentState>({
+    loading: false,
+    uploading: false,
+    deleting: false,
+    showForm: false,
+  });
+
+  categoryForm!: FormGroup<{
+    title: FormControl<string | null>;
+    position: FormControl<number | null>;
+    status: FormControl<StatusType | null>;
+    description: FormControl<string | null>;
+    thumbnail: FormControl<string | null>;
+  }>;
+
   fileList: NzUploadFile[] = [];
-  cloudinaryData: CloudinarySignature | null = null;
   selectedCategory: Category | null = null;
-  selectedCategorySubscription: Subscription | null = null;
-  ExtractFileNameFromUrl = extractFileNameFromUrl;
-  options: OptionType[] = [
-    {
-      content: 'Active',
-      value: 'active',
-    },
-    {
-      content: 'Inactive',
-      value: 'inactive',
-    },
-  ];
+  previewVisible = false;
+  previewImage = '';
+
+  readonly isLoading$ = this.state$.pipe(
+    map((state) => state.loading || state.uploading || state.deleting)
+  );
+
+  readonly cloudinaryConfig$ = this.store.select(
+    getCloudinarySignatureSelector
+  );
 
   ngOnInit(): void {
-    this.actionLoadingSubscription = this.store
-      .select(getCategoryActionLoadingSelector)
-      .subscribe({
-        next: (loading) => {
-          this.loading = loading;
-        },
-      });
-
-    this.detailLoadingSubscription = this.store
-      .select(getCategoryDetailLoadingSelector)
-      .subscribe({
-        next: (loading) => {
-          this.loading = loading;
-        },
-      });
-
-    this.showFormSubscription = this.store
-      .select(getValueShowFormOfCategory)
-      .subscribe({
-        next: (showForm) => {
-          this.showForm = showForm;
-        },
-      });
-
-    this.store.select(getCloudinarySignatureSelector).subscribe({
-      next: (res: CloudinarySignature | null) => {
-        this.cloudinaryData = res;
-      },
-    });
-
-    this.categoryForm = new FormGroup({
-      title: new FormControl(null, [Validators.required]),
-      position: new FormControl(null, [Validators.minLength(0)]),
-      status: new FormControl('draft', [Validators.required]),
-      description: new FormControl(null),
-      thumbnail: new FormControl(null),
-    });
-
-    this.SubsribeToSelectedCategory();
+    this.initForm();
+    this.subscribeToState();
+    this.subscribeToSelectedCategory();
   }
+
+  private initForm(): void {
+    this.categoryForm = this.fb.group({
+      title: [null as string | null, Validators.required],
+      position: [null as number | null, Validators.min(0)],
+      status: [StatusType.DRAFT, Validators.required],
+      description: [null as string | null],
+      thumbnail: [null as string | null],
+    });
+  }
+
+  private subscribeToState(): void {
+    combineLatest([
+      this.store.select(getCategoryActionLoadingSelector),
+      this.store.select(getValueShowFormOfCategory),
+    ])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(([loading, showForm]) => {
+        this.state$.next({
+          ...this.state$.value,
+          loading,
+          showForm,
+        });
+      });
+  }
+
+  private subscribeToSelectedCategory(): void {
+    this.store
+      .select(getSelectedCategorySelector)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((category) => {
+        this.selectedCategory = category;
+        if (category) {
+          this.populateForm(category);
+        } else {
+          this.resetForm();
+        }
+      });
+  }
+
+  private populateForm(category: Category): void {
+    this.categoryForm.patchValue(category);
+
+    if (category.thumbnail) {
+      this.fileList = [
+        {
+          uid: '-1',
+          name: extractFileNameFromUrl(category.thumbnail),
+          status: 'done',
+          url: category.thumbnail,
+          thumbUrl: category.thumbnail,
+          response: {
+            public_id: extractPublicId(category.thumbnail),
+          },
+        },
+      ];
+    }
+  }
+
+  uploadToCloudinary = (item: NzUploadXHRArgs): Subscription => {
+    const file = this.extractFile(item);
+
+    if (!file) {
+      item.onError?.(new Error('Invalid file'), item.file as NzUploadFile);
+      return new Subscription();
+    }
+
+    return this.cloudinaryConfig$
+      .pipe(
+        take(1),
+        switchMap((config) => {
+          if (!config) {
+            throw new Error('Cloudinary configuration missing');
+          }
+          return this.cloudinaryService.upload(file, config);
+        }),
+        tap((event) => {
+          if (event.type === HttpEventType.UploadProgress) {
+            const progress = Math.round(
+              (100 * event.loaded) / (event.total || 1)
+            );
+            item.onProgress?.({ percent: progress }, item.file);
+          } else if (event.type === HttpEventType.Response) {
+            this.handleUploadSuccess(event.body, item);
+          }
+        }),
+        catchError((error) => {
+          this.handleUploadError(error, item);
+          return of(null);
+        })
+      )
+      .subscribe();
+  };
+
+  private extractFile(item: NzUploadXHRArgs): File | null {
+    if (item.file instanceof File) {
+      return item.file;
+    }
+    if ((item.file as NzUploadFile).originFileObj) {
+      return (item.file as NzUploadFile).originFileObj!;
+    }
+    return null;
+  }
+
+  private handleUploadSuccess(body: any, item: NzUploadXHRArgs): void {
+    if (body?.secure_url) {
+      this.categoryForm.patchValue({ thumbnail: body.secure_url });
+      item.onSuccess?.(body, item.file, body);
+    }
+  }
+
+  private handleUploadError(error: any, item: NzUploadXHRArgs): void {
+    item.onError?.(error, item.file as NzUploadFile);
+  }
+
+  private resetForm(): void {
+    this.categoryForm.reset({ status: StatusType.DRAFT });
+    this.fileList = [];
+    this.selectedCategory = null;
+    this.store.dispatch(setSelectedCategory({ selectedCategory: null }));
+  }
+
+  handleRemove = (file: NzUploadFile): Observable<boolean> => {
+    const publicId =
+      file.response?.public_id || extractPublicId(file.url || '');
+
+    if (!publicId) {
+      return of(false);
+    }
+
+    return this.cloudinaryService
+      .deleteCloudinaryFile({ publicId, resourceType: 'image' })
+      .pipe(
+        tap(() => {
+          this.clearThumbnail();
+        }),
+        map(() => true),
+        catchError((error) => {
+          return of(false);
+        })
+      );
+  };
+
+  private clearThumbnail(): void {
+    this.categoryForm.patchValue({ thumbnail: null });
+    this.fileList = [];
+
+    if (this.selectedCategory) {
+      this.categoryService.updateCategory(this.selectedCategory.id, {
+        thumbnail: '',
+      });
+    }
+  }
+
+  onSubmit(): void {
+    if (this.categoryForm.invalid) {
+      Object.values(this.categoryForm.controls).forEach((control) => {
+        control.markAsTouched();
+      });
+      return;
+    }
+
+    const formData = this.categoryForm.value;
+
+    if (this.selectedCategory) {
+      const cleanFormData: UpdateCategoryRequest = {
+        title: formData.title ?? undefined,
+        description: formData.description ?? undefined,
+        thumbnail: formData.thumbnail ?? undefined,
+        status: formData.status ?? undefined,
+        position: formData.position ?? undefined,
+      };
+      this.store.dispatch(
+        updateCategory({
+          id: this.selectedCategory.id,
+          updateCategoryRequest: cleanFormData,
+        })
+      );
+    } else {
+      const cleanFormData: AddCategoryRequest = {
+        title: formData.title as string,
+        description: formData.description ?? undefined,
+        thumbnail: formData.thumbnail ?? undefined,
+        status: formData.status ?? undefined,
+        position: formData.position ?? undefined,
+      };
+      this.store.dispatch(addCategory({ addCategoryRequest: cleanFormData }));
+    }
+
+    this.closeForm();
+  }
+
+  closeForm(): void {
+    this.store.dispatch(showForm({ value: false }));
+    if (!this.state$.value.loading) {
+      this.resetForm();
+    }
+  }
+
+  handleChangeUpload(info: NzUploadChangeParam) {
+    this.fileList = info.fileList.slice(-1);
+  }
+
+  handleDownload = async (file: NzUploadFile) => {
+    await handleDownloadHelper(file);
+  };
 
   handlePreview = async (
     file: NzUploadFile & { preview?: string }
@@ -159,232 +358,9 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
     this.previewVisible = true;
   };
 
-  OnCloseForm() {
-    this.store.dispatch(showForm({ value: false }));
-    if (!this.loading) {
-      this.ResetForm();
-    }
-  }
-
-  uploadToCloudinary = (item: NzUploadXHRArgs): Subscription => {
-    // Extract the actual File object correctly from nz-upload
-    let file: File | undefined;
-
-    // Try multiple ways to get the file
-    if (item.file instanceof File) {
-      file = item.file;
-    } else if ((item.file as NzUploadFile).originFileObj) {
-      file = (item.file as NzUploadFile).originFileObj;
-    } else if ((item.file as any) instanceof File) {
-      file = item.file as any;
-    }
-
-    // Debug log
-    console.log('File extraction:', {
-      hasFile: !!file,
-      fileName: file?.name,
-      fileSize: file?.size,
-      fileType: file?.type,
-      itemFile: item.file,
-    });
-
-    if (!file || !(file instanceof File)) {
-      console.error('Invalid file object:', item.file);
-      item.onError!(new Error('Invalid file'), item.file as NzUploadFile);
-      return new Subscription();
-    }
-
-    if (!this.cloudinaryData) {
-      console.error('No cloudinaryData available!');
-      item.onError!(
-        new Error('Cloudinary configuration missing'),
-        item.file as NzUploadFile
-      );
-      return new Subscription();
-    }
-
-    console.log('Cloudinary Data:', this.cloudinaryData);
-
-    const formData = new FormData();
-
-    // IMPORTANT: Append in this exact order
-    formData.append('file', file, file.name);
-    formData.append('api_key', this.cloudinaryData.apiKey);
-    formData.append('timestamp', this.cloudinaryData.timestamp.toString());
-    formData.append('signature', this.cloudinaryData.signature);
-    formData.append('folder', this.cloudinaryData.folder);
-
-    // Debug: Log FormData contents
-    console.log('FormData contents:');
-    formData.forEach((value, key) => {
-      if (key === 'file') {
-        console.log(
-          `  ${key}: File(${(value as File).name}, ${
-            (value as File).size
-          } bytes)`
-        );
-      } else {
-        console.log(`  ${key}: ${value}`);
-      }
-    });
-
-    const xhr = new XMLHttpRequest();
-
-    xhr.upload.addEventListener('progress', (event) => {
-      if (event.lengthComputable) {
-        const percent = (event.loaded / event.total) * 100;
-        console.log(`Progress: ${percent.toFixed(0)}%`);
-        item.onProgress!({ percent }, item.file as NzUploadFile);
-      }
-    });
-
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === 4) {
-        console.log('Response received:', {
-          status: xhr.status,
-          statusText: xhr.statusText,
-          response: xhr.responseText,
-        });
-
-        if (xhr.status === 200) {
-          console.log('Upload successful!');
-          const response = JSON.parse(xhr.responseText);
-          item.onSuccess!(response, item.file as NzUploadFile, xhr);
-          this.categoryForm.patchValue({
-            thumbnail: response.secure_url,
-          });
-        } else {
-          console.error('Upload failed:', {
-            status: xhr.status,
-            statusText: xhr.statusText,
-            response: xhr.responseText,
-          });
-
-          let errorMsg = 'Upload failed';
-          try {
-            const errorResponse = JSON.parse(xhr.responseText);
-            errorMsg = errorResponse.error?.message || xhr.responseText;
-            console.error('Error details:', errorResponse);
-          } catch (e) {
-            errorMsg = `HTTP ${xhr.status}: ${xhr.statusText}`;
-          }
-
-          item.onError!(new Error(errorMsg), item.file as NzUploadFile);
-        }
-      }
-    };
-
-    // Use /auto/upload endpoint
-    const uploadUrl = `https://api.cloudinary.com/v1_1/${this.cloudinaryData.cloudName}/${this.cloudinaryData.resourceType}/upload`;
-
-    console.log('Upload URL:', uploadUrl);
-
-    xhr.open('POST', uploadUrl, true);
-    xhr.send(formData);
-
-    return new Subscription();
-  };
-
-  handleChangeUpload(info: NzUploadChangeParam) {
-    this.fileList = info.fileList.slice(-1);
-  }
-
-  handleDownload = async (file: NzUploadFile) => {
-    await handleDownloadHelper(file);
-  };
-
-  handleRemove = (file: NzUploadFile) => {
-    // Lấy publicId từ response sau khi upload thành công
-    const publicId = file.response?.public_id || file.name;
-
-    if (!publicId) return false;
-
-    try {
-      // Gọi API DELETE của BE
-      this.store.dispatch(
-        deleteCloudinaryFile({
-          deleteCloudinaryRequest: { publicId, resourceType: 'image' },
-        })
-      );
-
-      if (this.selectedCategory) {
-        this.store.dispatch(
-          updateCategory({
-            id: this.selectedCategory.id,
-            updateCategoryRequest: { thumbnail: '' },
-          })
-        );
-      }
-
-      // // Xóa khỏi form
-      this.categoryForm.patchValue({ thumbnail: null });
-
-      // Xóa thành công
-      console.log('✅ File deleted successfully from Cloudinary');
-      return true; // cho phép nz-upload xóa khỏi fileList
-    } catch (error) {
-      console.error('❌ Failed to delete file:', error);
-      return false; // không xóa khỏi fileList
-    }
-  };
-
-  SubsribeToSelectedCategory() {
-    this.selectedCategorySubscription = this.store
-      .select(getSelectedCategorySelector)
-      .subscribe({
-        next: (category) => {
-          this.selectedCategory = category;
-          console.log(category);
-          if (category) {
-            this.categoryForm.patchValue(category);
-            if (category.thumbnail) {
-              this.fileList = [
-                {
-                  uid: '-1',
-                  name: extractFileNameFromUrl(category.thumbnail),
-                  status: 'done',
-                  url: category.thumbnail,
-                  thumbUrl: category.thumbnail,
-                  response: {
-                    public_id: extractPublicId(category.thumbnail),
-                  },
-                },
-              ];
-            }
-          } else {
-            this.ResetForm();
-          }
-        },
-      });
-  }
-
-  OnSubmitted() {
-    if (this.selectedCategory) {
-      this.store.dispatch(
-        updateCategory({
-          id: this.selectedCategory.id,
-          updateCategoryRequest: this.categoryForm.value,
-        })
-      );
-    } else {
-      this.store.dispatch(
-        addCategory({ addCategoryRequest: this.categoryForm.value })
-      );
-    }
-    this.ResetForm();
-  }
-
-  ResetForm() {
-    this.categoryForm.reset({ status: 'draft' });
-    this.fileList = [];
-    this.selectedCategory = null;
-    this.store.dispatch(setSelectedCategory({ selectedCategory: null }));
-  }
-
   ngOnDestroy(): void {
-    this.showFormSubscription.unsubscribe();
-    this.actionLoadingSubscription?.unsubscribe();
-    this.detailLoadingSubscription?.unsubscribe();
-    this.ResetForm();
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.state$.complete();
   }
 }

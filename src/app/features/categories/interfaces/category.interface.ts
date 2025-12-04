@@ -1,4 +1,5 @@
 import { Category } from '../../../Models/category.model';
+import { StatusType } from '../../../shared/enums/status.enum';
 
 export interface MetaInfo {
   totalItems: number;
@@ -37,7 +38,7 @@ export interface AddCategoryRequest {
   title: string;
   description?: string;
   thumbnail?: string;
-  status?: string;
+  status?: StatusType;
   position?: number;
 }
 
@@ -45,6 +46,13 @@ export interface UpdateCategoryRequest {
   title?: string;
   description?: string;
   thumbnail?: string;
-  status?: string;
+  status?: StatusType;
   position?: number;
+}
+
+export interface ComponentState {
+  loading: boolean;
+  uploading: boolean;
+  deleting: boolean;
+  showForm: boolean;
 }
