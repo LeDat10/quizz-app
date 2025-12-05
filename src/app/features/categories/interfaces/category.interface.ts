@@ -56,3 +56,17 @@ export interface ComponentState {
   deleting: boolean;
   showForm: boolean;
 }
+
+export interface TableState {
+  pageIndex: number;
+  pageSize: number;
+  scrollY: string;
+  checked: boolean;
+  indeterminate: boolean;
+}
+
+export interface SelectionState {
+  selectedIds: Set<number>;
+  hasSelection: boolean;
+  selectionCount: number;
+}

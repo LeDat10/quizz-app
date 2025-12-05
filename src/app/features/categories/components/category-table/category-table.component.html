@@ -1,15 +1,15 @@
-<nz-spin [nzSpinning]="listLoading$ | async" nzTip="Loading Categories...">
+<nz-spin [nzSpinning]="loading$ | async" nzTip="Loading Categories...">
   <nz-table
     nzShowPagination
     nzShowSizeChanger
     [nzData]="categories"
-    [nzPageIndex]="(meta$ | async)?.currentPage || 1"
-    [nzPageSize]="(meta$ | async)?.itemsPerPage || pageSize"
-    [nzTotal]="(meta$ | async)?.totalItems || 0"
+    [nzPageIndex]="(tableState$ | async)?.pageIndex || 1"
+    [nzPageSize]="(tableState$ | async)?.pageSize || 10"
+    [nzTotal]="(tableState$ | async)?.total || 0"
     [nzFrontPagination]="false"
     (nzPageIndexChange)="onPageIndexChange($event)"
     (nzPageSizeChange)="onPageSizeChange($event)"
-    [nzScroll]="{ x: 'auto', y: scrollY }"
+    [nzScroll]="{ x: '992px' }"
   >
     <thead>
       <tr>
@@ -33,7 +33,7 @@
       @for (data of categories; track data.id) {
       <tr>
         <td
-          [nzChecked]="setOfCheckedId.has(data.id)"
+          [nzChecked]="isItemSelected(data.id)"
           (nzCheckedChange)="onItemChecked(data.id, $event)"
           nzLeft
         ></td>
@@ -54,7 +54,7 @@
         <td>
           <button
             class="cursor-pointer"
-            (click)="OnChangeStatus({ id: data.id, status: data.status })"
+            (click)="onChangeStatus({ id: data.id, status: data.status })"
           >
             <nz-tag [nzColor]="statusTypeMap[data.status]">{{
               data.status
@@ -69,7 +69,7 @@
               </button>
             </div>
             <div nz-col nz-tooltip nzTooltipTitle="Edit">
-              <button nz-button nzType="link" (click)="OnCategoryEdit(data.id)">
+              <button nz-button nzType="link" (click)="onCategoryEdit(data.id)">
                 <nz-icon nzType="edit" nzTheme="outline" />
               </button>
             </div>
@@ -86,9 +86,9 @@
   </nz-table>
 
   <app-action-bar
-    [selectedQuantity]="setOfCheckedId.size"
-    (positionClicked)="OnUpdatePositionMultiple()"
-    (statusClicked)="OnUpdateStatusMultiple($event)"
-    (closeActionBarClicked)="OnCloseActionBar()"
+    [selectedQuantity]="getSelectionCount()"
+    (positionClicked)="onUpdatePositionMultiple()"
+    (statusClicked)="onUpdateStatusMultiple($event)"
+    (closeActionBarClicked)="onCloseActionBar()"
   ></app-action-bar>
 </nz-spin>

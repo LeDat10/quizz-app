@@ -21,19 +21,25 @@ import { statusTypeMapFull } from '../../../../constants/status';
 import {
   changeCategoryPage,
   changeCategoryStatus,
-  getCategoryDetail,
   loadCategoryForEdit,
   showForm,
   updateCategoryPositionMultiple,
   updateCategoryStatusnMultiple,
 } from '../../states/categories.actions';
 import { StatusType } from '../../../../shared/enums/cloudinary.enum';
-import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { MetaInfo } from '../../interfaces/category.interface';
+import { combineLatest, map, Observable, Subject, takeUntil } from 'rxjs';
+import { SelectionState } from '../../interfaces/category.interface';
 import { CommonModule } from '@angular/common';
 import { DEFAULT_LIMIT } from '../../../../constants/Constants';
 import { ActionBarComponent } from '../../../../shared/components/action-bar/action-bar.component';
+
+const STATUS_TRANSITIONS: Record<StatusType, StatusType> = {
+  [StatusType.DRAFT]: StatusType.PUBLISHED,
+  [StatusType.PUBLISHED]: StatusType.INACTIVE,
+  [StatusType.INACTIVE]: StatusType.ARCHIVED,
+  [StatusType.ARCHIVED]: StatusType.DRAFT,
+};
+
 @Component({
   selector: 'app-category-table',
   imports: [
@@ -54,139 +60,177 @@ import { ActionBarComponent } from '../../../../shared/components/action-bar/act
   styleUrl: './category-table.component.scss',
 })
 export class CategoryTableComponent implements OnInit {
-  store: Store<AppState> = inject(Store);
-  router: Router = inject(Router);
+  private readonly store = inject(Store<AppState>);
+  private readonly destroy$ = new Subject<void>();
+
+  readonly categories$ = this.store.select(getCategoriesSelector);
+  readonly loading$ = this.store.select(getCategoryListLoadingSelector);
+  readonly meta$ = this.store.select(getMetaSelector);
+
+  readonly tableState$ = this.meta$.pipe(
+    map((meta) => ({
+      total: meta?.totalItems || 0,
+      pageIndex: meta?.currentPage || 1,
+      pageSize: meta?.itemsPerPage || DEFAULT_LIMIT,
+    }))
+  );
+
+  private readonly selectedIds = new Set<number>();
+  readonly selection$: Observable<SelectionState> = combineLatest([
+    this.categories$,
+  ]).pipe(
+    map(([categories]) => ({
+      selectedIds: this.selectedIds,
+      hasSelection: this.selectedIds.size > 0,
+      selectionCount: this.selectedIds.size,
+      allSelected:
+        categories.length > 0 &&
+        categories.every((item) => this.selectedIds.has(item.id)),
+      indeterminate:
+        this.selectedIds.size > 0 &&
+        categories.some((item) => !this.selectedIds.has(item.id)),
+    }))
+  );
+
+  readonly statusTypeMap = statusTypeMapFull;
   categories: Category[] = [];
-  statusTypeMap = statusTypeMapFull;
-  pageSize: number = DEFAULT_LIMIT;
-  meta$: Observable<MetaInfo | null> | null = null;
-  setOfCheckedId = new Set<number>();
-  pageIndex: number = 1;
-  pageLimit: number = DEFAULT_LIMIT;
-  scrollY: string = '500px';
-  checked: boolean = false;
-  indeterminate: boolean = false;
-  listLoading$: Observable<boolean> | null = null;
+  checked = false;
+  indeterminate = false;
+
   ngOnInit(): void {
-    this.listLoading$ = this.store.select(getCategoryListLoadingSelector);
-    this.store.select(getCategoriesSelector).subscribe({
-      next: (data) => {
-        this.categories = data.map((item) => ({ ...item }));
-      },
+    this.subscribeToCategories();
+  }
+
+  private subscribeToCategories(): void {
+    this.categories$.pipe(takeUntil(this.destroy$)).subscribe((categories) => {
+      this.categories = categories;
+      this.updateSelectionState();
     });
-
-    this.meta$ = this.store.select(getMetaSelector);
   }
 
-  calculateScrollHeight(): void {
-    const breadcrumb = 22;
-    const headerHeight = 64;
-    const paginationHeight = 32;
-    const padding = 24 * 2;
-    const headerPage = 51;
-    const tableHeight =
-      headerHeight + paginationHeight + padding + headerPage + breadcrumb;
-    this.scrollY = `calc(100vh - ${tableHeight}px)`;
+  onChangeStatus(params: { id: string | number; status: string }): void {
+    const currentStatus = params.status as StatusType;
+    const nextStatus = STATUS_TRANSITIONS[currentStatus] || StatusType.DRAFT;
+
+    this.store.dispatch(
+      changeCategoryStatus({
+        id: params.id,
+        status: nextStatus,
+      })
+    );
   }
 
-  OnChangeStatus(params: { id: string | number; status: string }) {
-    let statusRequest: string = '';
-    switch (params.status) {
-      case StatusType.DRAFT:
-        statusRequest = StatusType.PUBLISHED;
-        break;
-      case StatusType.PUBLISHED:
-        statusRequest = StatusType.INACTIVE;
-        break;
-      case StatusType.INACTIVE:
-        statusRequest = StatusType.ARCHIVED;
-        break;
-      case StatusType.ARCHIVED:
-        statusRequest = StatusType.DRAFT;
-        break;
-      default:
-        statusRequest = StatusType.DRAFT;
-        break;
-    }
+  private updateSelectionState(): void {
+    this.checked =
+      this.categories.length > 0 &&
+      this.categories.every((item) => this.selectedIds.has(item.id));
 
-    params.status = statusRequest;
-    this.store.dispatch(changeCategoryStatus(params));
+    this.indeterminate = this.selectedIds.size > 0 && !this.checked;
   }
 
-  OnCategoryEdit(id: string | number) {
+  onCategoryEdit(id: string | number): void {
     this.store.dispatch(showForm({ value: true }));
     this.store.dispatch(loadCategoryForEdit({ categoryId: id }));
   }
 
-  onPageIndexChange(newIndex: number) {
-    this.pageIndex = newIndex;
+  onPageIndexChange(pageIndex: number): void {
     this.store.dispatch(
       changeCategoryPage({
-        queryParams: { page: newIndex, limit: this.pageLimit },
+        queryParams: {
+          page: pageIndex,
+          limit: DEFAULT_LIMIT,
+        },
       })
     );
   }
 
-  onPageSizeChange(newPageSize: number) {
-    this.pageLimit = newPageSize;
+  onPageSizeChange(pageSize: number): void {
     this.store.dispatch(
       changeCategoryPage({
-        queryParams: { page: 1, limit: newPageSize },
+        queryParams: {
+          page: 1,
+          limit: pageSize,
+        },
       })
     );
   }
 
-  onAllChecked(checked: boolean) {
-    this.categories.forEach(({ id }) => this.updateCheckedSet(id, checked));
-    this.refreshCheckedStatus();
-  }
-
-  updateCheckedSet(id: number, checked: boolean): void {
+  onAllChecked(checked: boolean): void {
     if (checked) {
-      this.setOfCheckedId.add(id);
+      this.categories.forEach((item) => this.selectedIds.add(item.id));
     } else {
-      this.setOfCheckedId.delete(id);
+      this.selectedIds.clear();
     }
-  }
-
-  refreshCheckedStatus(): void {
-    this.checked = this.categories.every((item) =>
-      this.setOfCheckedId.has(item.id)
-    );
-
-    this.indeterminate =
-      this.categories.some((item) => this.setOfCheckedId.has(item.id)) &&
-      !this.checked;
+    this.updateSelectionState();
   }
 
   onItemChecked(id: number, checked: boolean): void {
-    this.updateCheckedSet(id, checked);
-    this.refreshCheckedStatus();
+    if (checked) {
+      this.selectedIds.add(id);
+    } else {
+      this.selectedIds.delete(id);
+    }
+    this.updateSelectionState();
   }
 
-  getSelectedPositions() {
-    return this.categories
-      .filter((item) => this.setOfCheckedId.has(item.id))
-      .map((item) => ({ id: item.id, position: item.position }));
-  }
-
-  OnUpdatePositionMultiple() {
+  onUpdatePositionMultiple(): void {
     const selectedPositions = this.getSelectedPositions();
+
+    if (selectedPositions.length === 0) {
+      return;
+    }
+
     this.store.dispatch(
       updateCategoryPositionMultiple({ dataRequests: selectedPositions })
     );
   }
 
-  OnUpdateStatusMultiple(status: string) {
-    const ids = [...this.setOfCheckedId];
+  onUpdateStatusMultiple(status: string): void {
+    const ids = Array.from(this.selectedIds);
+
+    if (ids.length === 0) {
+      return;
+    }
+
     this.store.dispatch(
-      updateCategoryStatusnMultiple({ request: { ids, status } })
+      updateCategoryStatusnMultiple({
+        request: { ids, status },
+      })
     );
   }
 
-  OnCloseActionBar() {
-    this.setOfCheckedId.clear();
-    this.checked = false;
-    this.indeterminate = false;
+  private getSelectedPositions(): Array<{ id: number; position: number }> {
+    return this.categories
+      .filter((item) => this.selectedIds.has(item.id))
+      .map((item) => ({
+        id: item.id,
+        position: item.position,
+      }));
+  }
+
+  onCloseActionBar(): void {
+    this.selectedIds.clear();
+    this.updateSelectionState();
+  }
+
+  isItemSelected(id: number): boolean {
+    return this.selectedIds.has(id);
+  }
+
+  getSelectionCount(): number {
+    return this.selectedIds.size;
+  }
+
+  hasSelection(): boolean {
+    return this.selectedIds.size > 0;
+  }
+
+  trackByCategory(index: number, item: Category): number {
+    return item.id;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
