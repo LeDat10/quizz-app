@@ -48,3 +48,9 @@ export interface CoursesPaginationResponse {
   meta: MetaInfo;
   links: LinksInfo;
 }
+
+export interface SelectionState {
+  selectedIds: Set<number>;
+  hasSelection: boolean;
+  selectionCount: number;
+}

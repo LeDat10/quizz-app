@@ -1,5 +1,15 @@
-<nz-spin [nzSpinning]="listLoading$ | async">
-  <nz-table [nzData]="courses" nzShowPagination>
+<nz-spin [nzSpinning]="loading$ | async">
+  <nz-table
+    [nzData]="courses"
+    nzShowPagination
+    nzShowSizeChanger
+    [nzPageIndex]="(tableState$ | async)?.pageIndex || 1"
+    [nzPageSize]="(tableState$ | async)?.pageSize || 10"
+    [nzTotal]="(tableState$ | async)?.total || 0"
+    [nzFrontPagination]="false"
+    (nzPageIndexChange)="onPageIndexChange($event)"
+    (nzPageSizeChange)="onPageSizeChange($event)"
+  >
     <thead>
       <tr>
         <th [nzChecked]="checked" [nzWidth]="'100px'" nzLeft></th>
@@ -35,7 +45,7 @@
         <td>
           <button
             class="cursor-pointer"
-            (click)="OnChangeStatus({ id: item.id, status: item.status })"
+            (click)="onChangeStatus({ id: item.id, status: item.status })"
           >
             <nz-tag [nzColor]="statusTypeMap[item.status]">
               {{ item.status }}
@@ -57,7 +67,7 @@
               </button>
             </div>
             <div nz-col nz-tooltip nzTooltipTitle="Edit">
-              <button nz-button nzType="link" (click)="OnEditCourse(item.id)">
+              <button nz-button nzType="link" (click)="onEditCourse(item.id)">
                 <nz-icon nzType="edit" nzTheme="outline" />
               </button>
             </div>
