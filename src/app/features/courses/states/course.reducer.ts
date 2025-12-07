@@ -3,9 +3,13 @@ import { courseAdapter, initialState } from './course.state';
 import {
   addCourseFailure,
   addCourseSuccess,
+  changeCoursePositionMultipleFailure,
+  changeCoursePositionMultipleSuccess,
   changeCoursesPageFailure,
   changeCoursesPageSuccess,
   changeCourseStatusFailure,
+  changeCourseStatusMultipleFailure,
+  changeCourseStatusMultipleSuccess,
   changeCourseStatusSuccess,
   getCoursesFailure,
   getCoursesSucccess,
@@ -151,5 +155,27 @@ export const courseReducer = createReducer(
   on(setSelectedCourse, (state, action) => ({
     ...state,
     selectedCourse: action.selectedCourse,
+  })),
+
+  // change course status multiple
+  on(changeCourseStatusMultipleSuccess, (state) => ({
+    ...state,
+    listLoading: false,
+  })),
+  on(changeCourseStatusMultipleFailure, (state, action) => ({
+    ...state,
+    error: action.error,
+    listLoading: false,
+  })),
+
+  // change course position multiple
+  on(changeCoursePositionMultipleSuccess, (state) => ({
+    ...state,
+    listLoading: false,
+  })),
+  on(changeCoursePositionMultipleFailure, (state, action) => ({
+    ...state,
+    listLoading: false,
+    error: action.error,
   }))
 );

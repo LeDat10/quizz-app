@@ -1,6 +1,8 @@
 import { createAction, props } from '@ngrx/store';
 import {
   AddCourseRequest,
+  ChangeCoursePositionMultipleRequest,
+  ChangeCourseStatusMultipleRequest,
   CoursesPaginationResponse,
   UpdateCourseRequest,
 } from '../interfaces/course.interface';
@@ -134,4 +136,34 @@ export const loadCourseForEditFailure = createAction(
 export const setSelectedCourse = createAction(
   '[course] set selected course',
   props<{ selectedCourse: Course | null }>()
+);
+
+// change course status multiple
+export const changeCourseStatusMultiple = createAction(
+  '[course] change course status multiple',
+  props<{ statusMultipleRequest: ChangeCourseStatusMultipleRequest }>()
+);
+
+export const changeCourseStatusMultipleSuccess = createAction(
+  '[course] change course status multiple success'
+);
+
+export const changeCourseStatusMultipleFailure = createAction(
+  '[course] change course status multiple failure',
+  props<{ error: HttpErrorResponse }>()
+);
+
+// change course position multiple
+export const changeCoursePositionMultiple = createAction(
+  '[course] change course position multiple',
+  props<{ positionMultipleRequest: ChangeCoursePositionMultipleRequest[] }>()
+);
+
+export const changeCoursePositionMultipleSuccess = createAction(
+  '[course] change course position multiple success'
+);
+
+export const changeCoursePositionMultipleFailure = createAction(
+  '[course] change course position multiple failure',
+  props<{ error: HttpErrorResponse }>()
 );

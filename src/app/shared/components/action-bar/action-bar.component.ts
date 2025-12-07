@@ -48,14 +48,15 @@ export class ActionBarComponent {
     delete: true,
   };
   @Output() positionClicked: EventEmitter<void> = new EventEmitter<void>();
-  @Output() statusClicked: EventEmitter<string> = new EventEmitter<string>();
+  @Output() statusClicked: EventEmitter<StatusType> =
+    new EventEmitter<StatusType>();
   @Output() closeActionBarClicked: EventEmitter<void> =
     new EventEmitter<void>();
   OnClickedPosition() {
     this.positionClicked.emit();
   }
 
-  OnStatusChange(value: string) {
+  OnStatusChange(value: StatusType) {
     this.statusClicked.emit(value);
   }
 

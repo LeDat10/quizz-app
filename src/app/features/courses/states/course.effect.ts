@@ -5,11 +5,17 @@ import {
   addCourse,
   addCourseFailure,
   addCourseSuccess,
+  changeCoursePositionMultiple,
+  changeCoursePositionMultipleFailure,
+  changeCoursePositionMultipleSuccess,
   changeCoursesPage,
   changeCoursesPageFailure,
   changeCoursesPageSuccess,
   changeCourseStatus,
   changeCourseStatusFailure,
+  changeCourseStatusMultiple,
+  changeCourseStatusMultipleFailure,
+  changeCourseStatusMultipleSuccess,
   changeCourseStatusSuccess,
   getCourses,
   getCoursesFailure,
@@ -208,6 +214,84 @@ export class CourseEffect {
           catchError((error) => of(loadCourseForEditFailure({ error })))
         );
       })
+    );
+  });
+
+  // change course status multiple
+  changeCourseStatusMultiple$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(changeCourseStatusMultiple),
+      switchMap((action) => {
+        this.store.dispatch(setListLoading({ value: true }));
+        return this.courseService
+          .changeStatusMultiple(action.statusMultipleRequest)
+          .pipe(
+            map(() => changeCourseStatusMultipleSuccess()),
+            catchError((error) =>
+              of(changeCourseStatusMultipleFailure({ error }))
+            )
+          );
+      })
+    );
+  });
+
+  changeCourseStatusMultipleSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(changeCourseStatusMultipleSuccess),
+      tap(() => {
+        this.notification.success(
+          SUCCESS_TITLES.CHANGED_STATUS,
+          SUCCESS_MESSAGES.COURSES_STATUS_UPDATED
+        );
+      }),
+      withLatestFrom(this.store.select(getCourseMetaSelector)),
+      map(([_, meta]) =>
+        changeCoursesPage({
+          queryParams: {
+            limit: meta?.itemsPerPage || DEFAULT_LIMIT,
+            page: meta?.currentPage || 1,
+          },
+        })
+      )
+    );
+  });
+
+  // change course position multiple
+  changeCoursePositionMultiple$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(changeCoursePositionMultiple),
+      switchMap((action) => {
+        this.store.dispatch(setListLoading({ value: true }));
+        return this.courseService
+          .changePositionMultiple(action.positionMultipleRequest)
+          .pipe(
+            map(() => changeCoursePositionMultipleSuccess()),
+            catchError((error) =>
+              of(changeCoursePositionMultipleFailure(error))
+            )
+          );
+      })
+    );
+  });
+
+  changeCoursePositionMultipleSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(changeCoursePositionMultipleSuccess),
+      tap(() => {
+        this.notification.success(
+          SUCCESS_TITLES.CHANGED_POSITION,
+          SUCCESS_MESSAGES.COURSES_POSITION_UPDATED
+        );
+      }),
+      withLatestFrom(this.store.select(getCourseMetaSelector)),
+      map(([_, meta]) =>
+        changeCoursesPage({
+          queryParams: {
+            limit: meta?.itemsPerPage || DEFAULT_LIMIT,
+            page: meta?.currentPage || 1,
+          },
+        })
+      )
     );
   });
 }

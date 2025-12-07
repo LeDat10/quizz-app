@@ -31,11 +31,14 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { CommonModule } from '@angular/common';
 import { StatusType } from '../../../../shared/enums/status.enum';
 import {
+  changeCoursePositionMultiple,
   changeCoursesPage,
   changeCourseStatus,
+  changeCourseStatusMultiple,
 } from '../../states/course.actions';
 import { Router } from '@angular/router';
 import { SelectionState } from '../../interfaces/course.interface';
+import { ActionBarComponent } from '../../../../shared/components/action-bar/action-bar.component';
 
 const STATUS_TRANSITIONS: Record<StatusType, StatusType> = {
   [StatusType.DRAFT]: StatusType.PUBLISHED,
@@ -56,6 +59,7 @@ const STATUS_TRANSITIONS: Record<StatusType, StatusType> = {
     FormsModule,
     NzSpinModule,
     CommonModule,
+    ActionBarComponent,
   ],
   templateUrl: './course-table.component.html',
   styleUrl: './course-table.component.scss',
@@ -105,7 +109,7 @@ export class CourseTableComponent implements OnInit, OnDestroy {
 
   private subscribeToCourses(): void {
     this.courses$.pipe(takeUntil(this.destroy$)).subscribe((courses) => {
-      this.courses = courses;
+      this.courses = courses.map((item) => ({ ...item }));
       this.updateSelectionState();
     });
   }
@@ -124,6 +128,15 @@ export class CourseTableComponent implements OnInit, OnDestroy {
       this.courses.length > 0 &&
       this.courses.every((item) => this.selectedIds.has(item.id));
     this.indeterminate = this.selectedIds.size > 0 && !this.checked;
+  }
+
+  private getSelectedPositions(): Array<{ id: number; position: number }> {
+    return this.courses
+      .filter((item) => this.selectedIds.has(item.id))
+      .map((item) => ({
+        id: item.id,
+        position: item.position,
+      }));
   }
 
   onPageIndexChange(pageIndex: number): void {
@@ -166,12 +179,48 @@ export class CourseTableComponent implements OnInit, OnDestroy {
     this.updateSelectionState();
   }
 
+  onEditCourse(id: string | number) {
+    this.router.navigateByUrl(`/admin/courses/${id}/update`);
+  }
+
+  onUpdateStatusMultiple(status: StatusType): void {
+    const ids = Array.from(this.selectedIds);
+
+    if (ids.length == 0) {
+      return;
+    }
+
+    this.store.dispatch(
+      changeCourseStatusMultiple({ statusMultipleRequest: { ids, status } })
+    );
+  }
+
+  getSelectionCount(): number {
+    return this.selectedIds.size;
+  }
+
+  onCloseActionBar(): void {
+    this.selectedIds.clear();
+    this.updateSelectionState();
+  }
+
+  isItemSelected(id: number): boolean {
+    return this.selectedIds.has(id);
+  }
+
+  onUpdatePositionMultiple(): void {
+    const selectedPositions = this.getSelectedPositions();
+    if (selectedPositions.length === 0) return;
+
+    this.store.dispatch(
+      changeCoursePositionMultiple({
+        positionMultipleRequest: selectedPositions,
+      })
+    );
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  onEditCourse(id: string | number) {
-    this.router.navigateByUrl(`/admin/courses/${id}/update`);
   }
 }

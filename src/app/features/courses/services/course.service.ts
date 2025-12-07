@@ -4,6 +4,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   AddCourseRequest,
+  ChangeCoursePositionMultipleRequest,
+  ChangeCourseStatusMultipleRequest,
+  CourseMultipleResponse,
   CourseResponse,
   CoursesPaginationResponse,
 } from '../interfaces/course.interface';
@@ -54,5 +57,23 @@ export class CourseService {
 
   getCourseDetail(id: string | number): Observable<CourseResponse> {
     return this.http.get<CourseResponse>(`${this.courseApi}/${id}`);
+  }
+
+  changeStatusMultiple(
+    statusMultipleRequest: ChangeCourseStatusMultipleRequest
+  ): Observable<CourseMultipleResponse> {
+    return this.http.patch<CourseMultipleResponse>(
+      `${this.courseApi}/status-multiple`,
+      statusMultipleRequest
+    );
+  }
+
+  changePositionMultiple(
+    positionMultipleRequest: ChangeCoursePositionMultipleRequest[]
+  ): Observable<CourseMultipleResponse> {
+    return this.http.patch<CourseMultipleResponse>(
+      `${this.courseApi}/position-multiple`,
+      positionMultipleRequest
+    );
   }
 }

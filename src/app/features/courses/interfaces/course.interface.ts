@@ -54,3 +54,19 @@ export interface SelectionState {
   hasSelection: boolean;
   selectionCount: number;
 }
+
+export interface ChangeCourseStatusMultipleRequest {
+  ids: number[];
+  status: StatusType;
+}
+
+export interface CourseMultipleResponse {
+  message: string;
+  data: Course[];
+  meta?: any;
+}
+
+export interface ChangeCoursePositionMultipleRequest {
+  id: string | number;
+  position: number;
+}

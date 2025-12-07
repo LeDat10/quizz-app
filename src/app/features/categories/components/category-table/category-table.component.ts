@@ -103,7 +103,7 @@ export class CategoryTableComponent implements OnInit {
 
   private subscribeToCategories(): void {
     this.categories$.pipe(takeUntil(this.destroy$)).subscribe((categories) => {
-      this.categories = categories;
+      this.categories = categories.map((item) => ({ ...item }));
       this.updateSelectionState();
     });
   }

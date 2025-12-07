@@ -12,7 +12,13 @@
   >
     <thead>
       <tr>
-        <th [nzChecked]="checked" [nzWidth]="'100px'" nzLeft></th>
+        <th
+          [nzChecked]="checked"
+          [nzWidth]="'100px'"
+          (nzCheckedChange)="onAllChecked($event)"
+          [nzIndeterminate]="indeterminate"
+          nzLeft
+        ></th>
         <th>Image</th>
         <th>Title</th>
         <th>Position</th>
@@ -27,7 +33,11 @@
     <tbody>
       @for (item of courses; track $index) {
       <tr>
-        <td [nzChecked]="false" nzLeft></td>
+        <td
+          [nzChecked]="isItemSelected(item.id)"
+          (nzCheckedChange)="onItemChecked(item.id, $event)"
+          nzLeft
+        ></td>
         <td>
           <img
             [src]="item.thumbnail"
@@ -82,4 +92,11 @@
       }
     </tbody>
   </nz-table>
+
+  <app-action-bar
+    [selectedQuantity]="getSelectionCount()"
+    (statusClicked)="onUpdateStatusMultiple($event)"
+    (closeActionBarClicked)="onCloseActionBar()"
+    (positionClicked)="onUpdatePositionMultiple()"
+  ></app-action-bar>
 </nz-spin>
