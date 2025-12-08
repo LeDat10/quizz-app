@@ -8,8 +8,24 @@ export const getBase64 = (file: File): Promise<string> =>
 
 // cloudinary-upload.helper.ts
 import { NzUploadFile, NzUploadXHRArgs } from 'ng-zorro-antd/upload';
-import { Subscription } from 'rxjs';
-import { CloudinarySignature } from '../interfaces/cloudinary.interface';
+import {
+  catchError,
+  Observable,
+  of,
+  Subscription,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
+import {
+  CloudinaryResponse,
+  CloudinarySignature,
+} from '../interfaces/cloudinary.interface';
+import {
+  HttpEvent,
+  HttpEventType,
+  HttpProgressEvent,
+} from '@angular/common/http';
 
 export function uploadToCloudinaryHelper(
   item: NzUploadXHRArgs,
@@ -86,6 +102,40 @@ export function uploadToCloudinaryHelper(
   xhr.send(formData);
 
   return new Subscription();
+}
+
+export function createCloudinaryUploader(
+  item: NzUploadXHRArgs,
+  file: File,
+  cloudinaryConfig$: Observable<CloudinarySignature | null>,
+  uploadFn: (
+    file: File,
+    config: CloudinarySignature
+  ) => Observable<HttpEvent<CloudinaryResponse>>,
+  callbacks: {
+    onProgress: (event: HttpProgressEvent, item: NzUploadXHRArgs) => void;
+    onSuccess: (body: any, item: NzUploadXHRArgs) => void;
+    onError: (err: any, item: NzUploadXHRArgs) => void;
+  }
+): Observable<any> {
+  return cloudinaryConfig$.pipe(
+    take(1),
+    switchMap((config) => {
+      if (!config) throw new Error('Cloudinary configuration missing');
+      return uploadFn(file, config);
+    }),
+    tap((event) => {
+      if (event.type === HttpEventType.UploadProgress) {
+        callbacks.onProgress(event, item);
+      } else if (event.type === HttpEventType.Response) {
+        callbacks.onSuccess(event.body, item);
+      }
+    }),
+    catchError((error) => {
+      callbacks.onError(error, item);
+      return of(null);
+    })
+  );
 }
 
 export const handleDownloadHelper = async (file: NzUploadFile) => {

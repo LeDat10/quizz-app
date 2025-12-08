@@ -70,3 +70,10 @@ export interface ChangeCoursePositionMultipleRequest {
   id: string | number;
   position: number;
 }
+
+export interface ComponentState {
+  loading: boolean;
+  uploading: boolean;
+  deleting: boolean;
+  showForm: boolean;
+}

@@ -5,10 +5,6 @@ import { getCourses, showForm } from '../../states/course.actions';
 import { AddCourseFormComponent } from '../../components/add-course-form/add-course-form.component';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import {
-  getAllCategoriesForDropDown,
-  getCloudinarySignature,
-} from '../../../../shared/states/shared.action';
 import { CourseTableComponent } from '../../components/course-table/course-table.component';
 import { Router } from '@angular/router';
 
@@ -32,13 +28,5 @@ export class CourseListComponent implements OnInit {
 
   OnAddCourse() {
     this.store.dispatch(showForm({ value: true }));
-    this.store.dispatch(
-      getCloudinarySignature({
-        cloudinary: {
-          folder: 'courses',
-          resourceType: 'image',
-        },
-      })
-    );
   }
 }

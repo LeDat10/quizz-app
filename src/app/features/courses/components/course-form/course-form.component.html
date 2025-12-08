@@ -1,9 +1,9 @@
-<nz-spin [nzSpinning]="actionLoading">
+<nz-spin [nzSpinning]="isLoading$ | async">
   <form
     nz-form
     nzLayout="vertical"
     [formGroup]="courseForm"
-    (ngSubmit)="OnSubmitted()"
+    (ngSubmit)="onSubmit()"
   >
     <nz-form-item>
       <nz-form-label nzRequired nzFor="title"> Title </nz-form-label>
@@ -44,7 +44,7 @@
         <nz-form-label nzFor="category"> Category </nz-form-label>
         <nz-form-control>
           <nz-select formControlName="categoryId" id="category">
-            @for(item of (allCategoriesForDropDown$ | async); track $index) {
+            @for(item of (categoriesForUpdate$ | async); track $index) {
             <nz-option [nzLabel]="item.title" [nzValue]="item.id"></nz-option>}
           </nz-select>
         </nz-form-control>
@@ -104,14 +104,11 @@
 
     <div nz-row [nzGutter]="16" nzJustify="end" nzAlign="middle">
       <div nz-col>
-        <button
-          nz-button
-          nzType="default"
-          type="button"
-          (click)="OnCloseForm()"
-        >
+        @if(!selectedCourse) {
+        <button nz-button nzType="default" type="button" (click)="closeForm()">
           Cancel
         </button>
+        }
       </div>
       <div nz-col>
         <button nz-button nzType="primary" type="submit">Save</button>

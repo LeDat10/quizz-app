@@ -6,12 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-// import { CustomInputComponent } from '../../../../shared/components/custom-input/custom-input.component';
 import { CustomTextareaComponent } from '../../../../shared/components/custom-textarea/custom-textarea.component';
-// import { CustomSelectComponent } from '../../../../shared/components/custom-select/custom-select.component';
-// import { CustomUploadImageComponent } from '../../../../shared/components/custom-upload-image/custom-upload-image.component';
-// import { CustomButtonComponent } from '../../../../shared/components/custom-button/custom-button.component';
-import { OptionType } from '../../../../core/interfaces/custom-select.interface';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../../store/app.state';
 import {
@@ -48,8 +43,6 @@ import {
   of,
   Subject,
   Subscription,
-  switchMap,
-  take,
   takeUntil,
   tap,
 } from 'rxjs';
@@ -63,6 +56,7 @@ import {
   extractPublicId,
 } from '../../../../shared/helpers/file.helper';
 import {
+  createCloudinaryUploader,
   getBase64,
   handleDownloadHelper,
 } from '../../../../shared/helpers/image.helper';
@@ -73,17 +67,15 @@ import {
   UpdateCategoryRequest,
 } from '../../interfaces/category.interface';
 import { StatusType } from '../../../../shared/enums/status.enum';
-import { HttpEventType } from '@angular/common/http';
+import { HttpProgressEvent } from '@angular/common/http';
 import { CategoryService } from '../../services/category.service';
+import { getCloudinarySignature } from '../../../../shared/states/shared.action';
+import { CloudinarySignature } from '../../../../shared/interfaces/cloudinary.interface';
 
 @Component({
   selector: 'app-category-form',
   imports: [
-    // CustomInputComponent,
     CustomTextareaComponent,
-    // CustomSelectComponent,
-    // CustomUploadImageComponent,
-    // CustomButtonComponent,
     ReactiveFormsModule,
     CommonModule,
     NzModalModule,
@@ -140,6 +132,11 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
     this.initForm();
     this.subscribeToState();
     this.subscribeToSelectedCategory();
+    this.store.dispatch(
+      getCloudinarySignature({
+        cloudinary: { folder: 'categories', resourceType: 'image' },
+      })
+    );
   }
 
   private initForm(): void {
@@ -183,7 +180,6 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
 
   private populateForm(category: Category): void {
     this.categoryForm.patchValue(category);
-
     if (category.thumbnail) {
       this.fileList = [
         {
@@ -208,31 +204,18 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
       return new Subscription();
     }
 
-    return this.cloudinaryConfig$
-      .pipe(
-        take(1),
-        switchMap((config) => {
-          if (!config) {
-            throw new Error('Cloudinary configuration missing');
-          }
-          return this.cloudinaryService.upload(file, config);
-        }),
-        tap((event) => {
-          if (event.type === HttpEventType.UploadProgress) {
-            const progress = Math.round(
-              (100 * event.loaded) / (event.total || 1)
-            );
-            item.onProgress?.({ percent: progress }, item.file);
-          } else if (event.type === HttpEventType.Response) {
-            this.handleUploadSuccess(event.body, item);
-          }
-        }),
-        catchError((error) => {
-          this.handleUploadError(error, item);
-          return of(null);
-        })
-      )
-      .subscribe();
+    return createCloudinaryUploader(
+      item,
+      file,
+      this.cloudinaryConfig$,
+      (file: File, config: CloudinarySignature) =>
+        this.cloudinaryService.upload(file, config),
+      {
+        onProgress: (event, item) => this.handleUploadProgress(event, item),
+        onSuccess: (body, item) => this.handleUploadSuccess(body, item),
+        onError: (err, item) => this.handleUploadError(err, item),
+      }
+    ).subscribe();
   };
 
   private extractFile(item: NzUploadXHRArgs): File | null {
@@ -250,6 +233,14 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
       this.categoryForm.patchValue({ thumbnail: body.secure_url });
       item.onSuccess?.(body, item.file, body);
     }
+  }
+
+  private handleUploadProgress(
+    event: HttpProgressEvent,
+    item: NzUploadXHRArgs
+  ) {
+    const progress = Math.round((100 * event.loaded) / (event.total || 1));
+    item.onProgress?.({ percent: progress }, item.file as NzUploadFile);
   }
 
   private handleUploadError(error: any, item: NzUploadXHRArgs): void {

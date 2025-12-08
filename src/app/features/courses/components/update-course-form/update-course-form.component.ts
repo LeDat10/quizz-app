@@ -1,22 +1,10 @@
 import { Component } from '@angular/core';
-import { CustomInputComponent } from '../../../../shared/components/custom-input/custom-input.component';
-import { CustomSelectComponent } from '../../../../shared/components/custom-select/custom-select.component';
-import { CustomTextareaComponent } from '../../../../shared/components/custom-textarea/custom-textarea.component';
-import { CustomUploadImageComponent } from '../../../../shared/components/custom-upload-image/custom-upload-image.component';
-import { CustomButtonComponent } from '../../../../shared/components/custom-button/custom-button.component';
 import { OptionType } from '../../../../core/interfaces/custom-select.interface';
 import { CourseFormComponent } from '../course-form/course-form.component';
 
 @Component({
   selector: 'app-update-course-form',
-  imports: [
-    CustomInputComponent,
-    CustomSelectComponent,
-    CustomTextareaComponent,
-    CustomUploadImageComponent,
-    CustomButtonComponent,
-    CourseFormComponent,
-  ],
+  imports: [CourseFormComponent],
   templateUrl: './update-course-form.component.html',
   styleUrl: './update-course-form.component.scss',
 })

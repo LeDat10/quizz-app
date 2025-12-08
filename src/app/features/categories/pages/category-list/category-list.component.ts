@@ -32,8 +32,8 @@ export class CategoryListComponent implements OnInit {
 
   OnAddCategory() {
     this.store.dispatch(showForm({ value: true }));
-    this.store.dispatch(
-      getCloudinarySignature({ cloudinary: { folder: 'categories' } })
-    );
+    // this.store.dispatch(
+    //   getCloudinarySignature({ cloudinary: { folder: 'categories' } })
+    // );
   }
 }

@@ -27,9 +27,9 @@
 
   <router-outlet></router-outlet>
 </div> -->
-
-@if(selectedCourse$ | async) {
+<!-- @let selected = selectedCourse$ | async; @if(selected) {
 <div>
-  <app-course-form [selectedCourse]="selectedCourse$ | async"></app-course-form>
+  <app-course-form [selectedCourse]="selected"></app-course-form>
 </div>
-}
+} -->
+<app-course-form></app-course-form>
